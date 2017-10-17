@@ -10,5 +10,17 @@ Volante is a flexible event-centric framework which facilitates a hub-and-spoke 
 ## Usage
 
 ```js
+const volante = require('volante');
+
+var hub = new volante.Hub();
+
+// various events/handlers
+hub.emit(...);
+hub.on(...);
+
+// to access an instance directly, use:
+var some_module = hub.getInstance('some-volante-module');
+some_module.some_method();
+
 ```
 

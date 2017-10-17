@@ -50,19 +50,26 @@ class Hub extends EventEmitter {
 
         // see if module is valid volante module
         if (pkg.name && pkg.version && pkg.description && mod.prototype instanceof(module.parent.exports.Spoke)) {
-          this.attach(mod);
+          var newspoke = new mod(this);
+          this.spokes.push({
+            name: pkg.name,
+            instance: newspoke
+          });
         }
       }
     });
   }
 
   //
-  // attach a spoke to this hub
+  // get the instance of the spoke with the given module name
   //
-  attach(spoke) {
-    var newspoke = new spoke(this);
-    this.spokes.push(newspoke);
-    this.debug(`hub has ${this.spokes.length} spoke(s) attached`);
+  getInstance(name) {
+    for (let s of this.spokes) {
+      if (s.name === name) {
+        return s.instance;
+      }
+    }
+    return null;
   }
 
   //

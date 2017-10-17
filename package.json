@@ -5,5 +5,10 @@
   "author": "Mike Smiley <msmiley@alumni.rice.edu>",
   "url": "https://github.com/msmiley/volante",
   "repository": "msmiley/volante.git",
-  "main": "./src"
+  "main": "./src",
+  "keywords": [
+    "hub",
+    "spoke",
+    "framework"
+  ]
 }
