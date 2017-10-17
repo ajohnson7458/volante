@@ -9,10 +9,22 @@ class Spoke {
     // save reference to hub
     this.hub = hub;
 
-    // call user-defined init() function, if present
-    if (this.init && typeof(this.init) === 'function') {
-      this.init();
-    }
+    // call init() method, which may be overridden
+    this.init();
+  }
+
+  //
+  // empty init method, may be overridden by user module for constructor-type
+  // initialization
+  //
+  init() {
+  }
+
+  //
+  // empty done method, may be overridden by user module for destructor-type
+  // teardown
+  //
+  done() {
   }
 
   //
@@ -38,6 +50,13 @@ class Spoke {
   error(err) {
     this.hub.error(err, this.constructor.name);
     return this;
+  }
+
+  //
+  // initiate a shutdown
+  //
+  shutdown() {
+    this.hub.shutdown();
   }
 
 }

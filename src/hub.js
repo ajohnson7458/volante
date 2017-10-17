@@ -9,27 +9,25 @@ class Hub extends EventEmitter {
   constructor() {
     super();
     // all loaded volante modules
-    this.spokes = [];
+    this._spokes = [];
 
     // internal debug flag
     this._isDebug = false;
 
     // directory to look for modules, resolved in index.js
     this.nodeModulesPath = module.parent.exports.modulePath;
-    this.findSpokes();
   }
 
   //
-  // find any npm modules with the specialy keyword calling them out as volante
+  // find any npm modules with the special keyword calling them out as volante
   // modules
   //
-  findSpokes() {
+  attachAll() {
     // iterate through node_modules looking for volante modules
     fs.readdirSync(this.nodeModulesPath).forEach((dir) => {
-      // path to current module
-      var modPath = path.join(this.nodeModulesPath, dir);
+      this.debug(`attaching ${dir}`);
       // path to package.json in module directory
-      var pkgPath = path.join(modPath, 'package.json');
+      var pkgPath = path.join(this.nodeModulesPath, dir, 'package.json');
 
       // try to load package.json for each module
       try {
@@ -39,25 +37,34 @@ class Hub extends EventEmitter {
         return; // no (or invalid) package.json, skip
       }
 
-      if (pkg['keywords'] && pkg['keywords'].indexOf(module.parent.exports.moduleKeyword) !== -1) {
-        // load volante module
-        try {
-          var mod = require(modPath);
-        } catch (e) {
-          console.error(`PARSING ERROR: invalid module found: ${modPath}`);
-          return; // invalid module, skip
-        }
-
-        // see if module is valid volante module
-        if (pkg.name && pkg.version && pkg.description && mod.prototype instanceof(module.parent.exports.Spoke)) {
-          var newspoke = new mod(this);
-          this.spokes.push({
-            name: pkg.name,
-            instance: newspoke
-          });
-        }
+      if (pkg.name && pkg.version && pkg.description && pkg['keywords'] && pkg['keywords'].indexOf(module.parent.exports.moduleKeyword) !== -1) {
+        this.attach(pkg.name);
       }
     });
+    this.emit('volante.attachAll', this._spokes.length);
+    return this;
+  }
+
+  attach(name) {
+    var modPath = path.join(this.nodeModulesPath, name);
+    // load volante module
+    try {
+      var mod = require(modPath);
+    } catch (e) {
+      console.error(`ATTACH ERROR: ${e}`);
+      return; // invalid module, skip
+    }
+
+    // see if module is valid volante module
+    if (mod.prototype instanceof(module.parent.exports.Spoke)) {
+      var newspoke = new mod(this);
+      this._spokes.push({
+        name: name,
+        instance: newspoke
+      });
+    }
+    this.emit('volante.attached', name);
+    return this;
   }
 
   //
@@ -94,7 +101,7 @@ class Hub extends EventEmitter {
   }
 
   //
-  // Standard log message handler
+  // normal log message handler
   //
   log(msg, src=this.constructor.name) {
     this.emit('volante.log', {
@@ -117,6 +124,18 @@ class Hub extends EventEmitter {
       msg: err
     });
     return this;
+  }
+
+  //
+  // standard shutdown handler
+  //
+  shutdown() {
+    this.emit('volante.shutdown');
+    for (let s of this._spokes) {
+      s.instance.done();
+    }
+    this.emit('volante.done');
+    process.exit(0);
   }
 }
 
