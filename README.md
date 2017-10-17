@@ -8,7 +8,9 @@ Volante is a flexible, event-centric framework which facilitates a zero-configur
 - automatic volante module loading (matched using 'volante' npm keyword)
 - built-in logging methods
 
-## Hub
+## `volante.Hub`
+
+The `volante.Hub` may be extended or instanced directly. The public `volante.Hub` methods are typically used to perform final stitching/configuration as shown below.
 
 ```js
 const volante = require('volante');
@@ -77,9 +79,9 @@ All Volante built-in events are namespaced with `volante.` They are listed below
 - `volante.shutdown` - emitted when shutdown initiated
 - `volante.done` - emitted when shutdown complete
 
-## Spokes
+## `volante.Spoke`
 
-Volante modules extend `volante.Spoke` and should optionally define an `init()` method instead of a `constructor()` to take advantage of `volante.Spoke` boilerplate.
+Volante modules extend `volante.Spoke` and should optionally define an `init()` method instead of a `constructor()` to take advantage of `volante.Spoke` boilerplate. A `done()` method is also optional and called at Volante shutdown.
 
 ### Properties provided by `volante.Spoke`
 - `hub` - a reference to the central `volante.Hub`
