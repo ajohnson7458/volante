@@ -1,0 +1,9 @@
+{
+  "name": "volante",
+  "description": "framework for flexible applications",
+  "version": "1.0.0",
+  "author": "Mike Smiley <msmiley@alumni.rice.edu>",
+  "url": "https://github.com/msmiley/volante",
+  "repository": "msmiley/volante.git",
+  "main": "./src"
+}
