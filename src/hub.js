@@ -25,7 +25,6 @@ class Hub extends EventEmitter {
   attachAll() {
     // iterate through node_modules looking for volante modules
     fs.readdirSync(this.nodeModulesPath).forEach((dir) => {
-      this.debug(`attaching ${dir}`);
       // path to package.json in module directory
       var pkgPath = path.join(this.nodeModulesPath, dir, 'package.json');
 
@@ -41,11 +40,12 @@ class Hub extends EventEmitter {
         this.attach(pkg.name);
       }
     });
-    this.emit('volante.attachAll', this._spokes.length);
+    this.emit('volante.attachedAll', this._spokes.length);
     return this;
   }
 
   attach(name) {
+    this.debug(`attaching ${name}`);
     var modPath = path.join(this.nodeModulesPath, name);
     // load volante module
     try {
@@ -63,6 +63,7 @@ class Hub extends EventEmitter {
         instance: newspoke
       });
     }
+    this.debug(`attached ${name}`);
     this.emit('volante.attached', name);
     return this;
   }

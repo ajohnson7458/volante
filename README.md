@@ -1,12 +1,13 @@
 ![volante](https://raw.githubusercontent.com/msmiley/msmiley.github.io/master/volante-with-text.svg?sanitize=true)
 
-Volante is a flexible, event-centric framework which facilitates a zero-configuration hub-and-spoke pattern. Leveraging the asynchronous nature of events makes it especially suited for modular microservices and services which span client and server. Although true zero-configuration is not always possible, Volante seeks to minimize configuration by finding all local Volante npm modules and attaching them as spokes automatically and by encouraging the use of sane defaults.
+Volante is a flexible, event-centric framework which facilitates a zero-configuration hub-and-spoke pattern. Leveraging the asynchronous nature of events makes it especially suited for modular microservices and services which span client and server. Although true zero-configuration is not always possible, Volante seeks to minimize configuration by automatically finding all local Volante npm modules and attaching them as spokes.
 
 ## Features
 
+- super-lightweight (no build-step, no dependencies)
 - zero-configuration as a goal
 - automatic volante module loading (matched using 'volante' npm keyword)
-- built-in logging methods
+- built-in logging methods (logging output delegated to volante spoke modules)
 
 ## `volante.Hub`
 
@@ -44,7 +45,7 @@ some_module.some_method();
 
 All Volante built-in events are namespaced with `volante.` They are listed below along with the data item emitted with the event.
 
-- `volante.attachAll` - all Spokes attached using .attachAll()
+- `volante.attachedAll` - all Spokes attached using .attachAll()
   ```js
   Number // number of Spoke modules found
   ```
