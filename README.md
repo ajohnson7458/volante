@@ -16,14 +16,14 @@ The `volante.Hub` may be extended or instanced directly. The public `volante.Hub
 ```js
 const volante = require('volante');
 
-var hub = new volante.Hub().attachAll();
+let hub = new volante.Hub().attachAll(); // attachAll automatically finds all local Volante modules
 
 // various events/handlers
 hub.emit(...);
 hub.on(...);
 
 // to access an instance directly, use:
-var some_module = hub.getInstance('some-volante-module');
+let some_module = hub.getInstance('some-volante-module');
 some_module.some_method();
 
 ```
@@ -38,12 +38,13 @@ some_module.some_method();
 - `getInstance(name)` - get a Spoke instance by module name
 - `log(Object)` - normal-level log messages
 - `debug(Object)` - debug-level log, also enables debug mode when called without an argument
+- `warn(Object)` - log a warning
 - `error(Object)` - log an error
 - `shutdown()` - shutdown Volante
 
 ### Events emitted by `volante.Hub`
 
-All Volante built-in events are namespaced with `volante.` They are listed below along with the data item emitted with the event.
+All Volante built-in events (except for `error`) are namespaced with `volante.` They are listed below along with the data item emitted with the event.
 
 - `volante.attachedAll` - all Spokes attached using .attachAll()
   ```js
@@ -69,7 +70,15 @@ All Volante built-in events are namespaced with `volante.` They are listed below
     msg: String
   }
   ```
-- `volante.error` - error log event
+- `volante.warn` - warning log level event
+  ```js
+  {
+    lvl: 'warning',
+    src: String, // Spoke class name
+    msg: String
+  }
+  ```
+- `error` - error log event
   ```js
   {
     lvl: 'error',
@@ -91,6 +100,7 @@ Volante modules extend `volante.Spoke` and should optionally define an `init()` 
 ### Methods provided by `volante.Spoke`
 - `log(Object)` - normal-level log messages
 - `debug(Object)` - debug-level log
+- `warn(Object)` - warning-level log
 - `error(Object)` - log an error
 - `shutdown()` - request a shutdown
 

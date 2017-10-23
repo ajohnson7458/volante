@@ -22,7 +22,7 @@ class Spoke {
 
   //
   // empty done method, may be overridden by user module for destructor-type
-  // teardown
+  // teardown before removal
   //
   done() {
   }
@@ -41,6 +41,14 @@ class Spoke {
   //
   log(msg) {
     this.hub.log(msg, this.constructor.name);
+    return this;
+  }
+
+  //
+  // Warning message handler
+  //
+  warn(msg) {
+    this.hub.warn(msg, this.constructor.name);
     return this;
   }
 
