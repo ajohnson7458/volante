@@ -64,7 +64,7 @@ class Hub extends EventEmitter {
   //
   attachLocal(name) {
     this.debug(`attaching local module ${name}`);
-    var modPath = path.join('.', name);
+    var modPath = `./${name}`;
     this.attachByFullPath(modPath);
   }
 
