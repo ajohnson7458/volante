@@ -16,5 +16,7 @@ module.exports = {
   moduleKeyword: 'volante',
 
   // resolve the path of the parent (for internal use)
-  modulePath: path.join(utils.findRoot(module.parent.filename), 'node_modules')
+  modulePath: path.join(utils.findRoot(module.parent.filename), 'node_modules'),
+  // resolve root of parent (for internal use)
+  parentRoot: utils.findRoot(module.parent.filename)
 };
