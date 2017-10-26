@@ -49,9 +49,30 @@ class Hub extends EventEmitter {
     return this;
   }
 
+  //
+  // standard attach function, provide Volante Spoke module name which is assumed
+  // to be installed in local node_modules directory
+  //
   attach(name) {
     this.debug(`attaching ${name}`);
     var modPath = path.join(this.nodeModulesPath, name);
+    this.attachByFullPath(modPath);
+  }
+
+  //
+  // attach local/relative Volante Spoke module
+  //
+  attachLocal(name) {
+    this.debug(`attaching local module ${name}`);
+    var modPath = path.join('.', name);
+    this.attachByFullPath(modPath);
+  }
+
+  //
+  // attach Volante Spoke module by providing fully resolved path
+  //
+  attachByFullPath(modPath) {
+    let name = path.basename(modPath);
     // load volante module
     try {
       var mod = require(modPath);
