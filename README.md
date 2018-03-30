@@ -89,15 +89,46 @@ All Volante built-in events (except for `error`) are namespaced with `volante.` 
 - `volante.shutdown` - emitted when shutdown initiated
 - `volante.done` - emitted when shutdown complete
 
-## `volante.Spoke`
+## Volante Spokes
 
-Volante modules extend `volante.Spoke` and should optionally define an `init()` method instead of a `constructor()` to take advantage of `volante.Spoke` boilerplate. A `done()` method is also optional and called at Volante shutdown.
+Volante modules are called Spokes and simply export an object with some predefined members. The object is automatically parsed and instantiated into the Volante framework.
 
-### Properties provided by `volante.Spoke`
-- `hub` - a reference to the central `volante.Hub`
-  - mainly used for `.on()` and `.emit()`
+### Example Spoke Definition
 
-### Methods provided by `volante.Spoke`
+```js
+module.exports = {
+	name: 'ExampleSpoke',
+	init() {
+		// constructor-like initialization
+		// called after all props and methods are available on this
+	},
+	events: {
+		// events this Spoke subscribes to
+		'some.event'(arg) {
+			// called when Hub receives 'some.event'
+			// use methods or props
+		}
+	},
+	props: {
+		// properties added to Spoke's this instance
+		// they are automatically updated when Hub receives
+		// an 'ExampleSpoke.props' event (i.e. `${this.name}.props`)
+		someProp: true
+	},
+	methods: {
+		// methods added to Spoke's this instance
+		someMethod() {
+			// do stuff
+		}
+	}
+}
+```
+
+### Built-in Properties
+- `$hub` - a reference to the central `volante.Hub`
+  - mainly used for `.emit()`
+
+### Built-in Methods
 - `log(Object)` - normal-level log messages
 - `debug(Object)` - debug-level log
 - `warn(Object)` - warning-level log
