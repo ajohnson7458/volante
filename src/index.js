@@ -2,9 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const utils = require('./utils');
 
-//
-// exports
-//
 module.exports = {
   Hub: require('./hub'),
   Spoke: require('./spoke'),

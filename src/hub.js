@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const EventEmitter = require('events').EventEmitter;
+const Spoke = require('./spoke');
 
 //
 // Hub provides a base class and reference implementation for a volante Hub.
@@ -8,6 +9,9 @@ const EventEmitter = require('events').EventEmitter;
 class Hub extends EventEmitter {
   constructor() {
     super();
+		
+		this.version = module.parent.exports.version;
+		
     // all loaded volante modules
     this.spokes = [];
 
@@ -40,7 +44,12 @@ class Hub extends EventEmitter {
           return; // no (or invalid) package.json, skip
         }
 
-        if (pkg.name && pkg.version && pkg.description && pkg['keywords'] && pkg['keywords'].indexOf(module.parent.exports.moduleKeyword) !== -1) {
+				// make sure it has all the required fields
+        if (pkg.name && 
+					  pkg.version && 
+					  pkg.description && 
+					  pkg['keywords'] && 
+					  pkg['keywords'].indexOf(module.parent.exports.moduleKeyword) !== -1) {
           this.attach(pkg.name);
         }
       }
@@ -72,7 +81,6 @@ class Hub extends EventEmitter {
   // attach Volante Spoke module by providing fully resolved path
   //
   attachByFullPath(modPath) {
-    let name = path.basename(modPath);
     // load volante module
     try {
       var mod = require(modPath);
@@ -81,16 +89,19 @@ class Hub extends EventEmitter {
       return; // invalid module, skip
     }
 
-    // see if module is valid volante module
-    if (mod.prototype instanceof(module.parent.exports.Spoke)) {
-      var newspoke = new mod(this);
+    // see if the spoke at least has a name
+    if (mod.name) {
+      var newspoke = new Spoke(this, mod);
       this.spokes.push({
-        name: name,
+        name: mod.name,
         instance: newspoke
       });
+    } else {
+      console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
+      return; // invalid module, skip
     }
-    this.debug(`attached ${name}`);
-    this.emit('volante.attached', name);
+    this.debug(`attached ${mod.name}`);
+    this.emit('volante.attached', mod.name);
     return this;
   }
 
