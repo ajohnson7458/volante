@@ -12,9 +12,9 @@ class Spoke {
 		
 		this.name = mod.name;
 		
-		this.addMethods(mod);
-		this.addEvents(mod);
-		this.addProps(mod);
+		this.$addMethods(mod);
+		this.$addEvents(mod);
+		this.$addProps(mod);
 
 		if (mod.init) {
 	    // call init() method
@@ -24,7 +24,7 @@ class Spoke {
 	//
 	// Add methods specified in SDO to this instance
 	//
-	addMethods(mod) {
+	$addMethods(mod) {
 		for (let [k,v] of Object.entries(mod.methods)) {
 			this[k] = v;
 		}
@@ -32,30 +32,40 @@ class Spoke {
 	//
 	// Add handlers to $hub for events specified in SDO and for props
 	//
-	addEvents(mod) {
+	$addEvents(mod) {
 		for (let [k,v] of Object.entries(mod.events)) {
 			this.$hub.on(k, v.bind(this));
 		}
 		
     this.$hub.on(`${this.name}.props`, (props) => {
       Object.assign(this, props);
+	    // call updated() method if it exists
+			if (mod.updated) {
+		    mod.updated.bind(this)();
+			}
     });
 		
 	}
 	//
 	// Merge props from SDO to this instance
 	//
-	addProps(mod) {
+	$addProps(mod) {
 		if (mod.props) {
 			Object.assign(this, mod.props);
 		}
+	}
+	//
+	// Emit an event across the Volante framework
+	//
+	$emit(...args) {
+		this.$hub.emit(...args);
 	}
   //
   // If no message is provided, enable debug on this handler, otherwise
   // this function will emit a log event if debug is enabled.
   //
   debug(msg) {
-    this.$hub.debug(msg, this.constructor.name);
+    this.$hub.debug(msg, this.name);
     return this;
   }
 
@@ -63,7 +73,7 @@ class Spoke {
   // Standard log message handler
   //
   log(msg) {
-    this.$hub.log(msg, this.constructor.name);
+    this.$hub.log(msg, this.name);
     return this;
   }
 
@@ -71,7 +81,7 @@ class Spoke {
   // Warning message handler
   //
   warn(msg) {
-    this.$hub.warn(msg, this.constructor.name);
+    this.$hub.warn(msg, this.name);
     return this;
   }
 
@@ -79,15 +89,8 @@ class Spoke {
   // error handler
   //
   error(err) {
-    this.$hub.error(err, this.constructor.name);
+    this.$hub.error(err, this.name);
     return this;
-  }
-
-  //
-  // initiate a shutdown
-  //
-  shutdown() {
-    this.$hub.shutdown();
   }
 
 }

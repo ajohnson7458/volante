@@ -115,6 +115,10 @@ module.exports = {
 		// an 'ExampleSpoke.props' event (i.e. `${this.name}.props`)
 		someProp: true
 	},
+	updated() {
+		// called after props are updated in response to
+		// 'ExampleSpoke.props' event (see props)
+	},
 	methods: {
 		// methods added to Spoke's this instance
 		someMethod() {
@@ -126,7 +130,7 @@ module.exports = {
 
 ### Built-in Properties
 - `$hub` - a reference to the central `volante.Hub`
-  - mainly used for `.emit()`
+- `$emit` - emit an event across volante
 
 ### Built-in Methods
 - `log(Object)` - normal-level log messages
@@ -134,28 +138,6 @@ module.exports = {
 - `warn(Object)` - warning-level log
 - `error(Object)` - log an error
 - `shutdown()` - request a shutdown
-
-### Example
-
-```js
-const volante = require('volante');
-
-class VolanteModule extends volante.Spoke {
-
-  init() {
-    this.hub.on('volante-module.some-command', (obj) => {
-      this.process(obj);
-    });
-  }
-
-  process() {
-    this.debug('processing');
-    ...
-    this.hub.emit('volante-module.results', obj);
-  }
-}
-```
-
 
 ## License
 

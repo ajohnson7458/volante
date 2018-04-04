@@ -24,7 +24,6 @@ class Hub extends EventEmitter {
     // pkg blacklist (don't try to load anything in nodeModulesPath matching these)
     this.packageBlacklist = ['.bin'];
   }
-
   //
   // find any npm modules with the special keyword calling them out as volante
   // modules
@@ -57,7 +56,6 @@ class Hub extends EventEmitter {
     this.emit('volante.attachedAll', this.spokes.length);
     return this;
   }
-
   //
   // standard attach function, provide Volante Spoke module name which is assumed
   // to be installed in local node_modules directory
@@ -67,7 +65,6 @@ class Hub extends EventEmitter {
     var modPath = path.join(this.nodeModulesPath, name);
     this.attachByFullPath(modPath);
   }
-
   //
   // attach local/relative Volante Spoke module
   //
@@ -76,7 +73,6 @@ class Hub extends EventEmitter {
     var modPath = path.join(module.parent.exports.parentRoot, name);
     this.attachByFullPath(modPath);
   }
-
   //
   // attach Volante Spoke module by providing fully resolved path
   //
@@ -104,7 +100,6 @@ class Hub extends EventEmitter {
     this.emit('volante.attached', mod.name);
     return this;
   }
-
   //
   // get the instance of the spoke with the given module name
   //
@@ -116,7 +111,6 @@ class Hub extends EventEmitter {
     }
     return null;
   }
-
   //
   // If no message is provided, enable debug mode on the hub, otherwise
   // this function will emit a log event if debug is enabled.
@@ -137,7 +131,6 @@ class Hub extends EventEmitter {
     }
     return this;
   }
-
   //
   // normal log message handler
   //
@@ -149,7 +142,6 @@ class Hub extends EventEmitter {
     });
     return this;
   }
-
   //
   // warning log message handler
   //
@@ -161,7 +153,6 @@ class Hub extends EventEmitter {
     });
     return this;
   }
-
   //
   // error handler
   //
@@ -175,7 +166,6 @@ class Hub extends EventEmitter {
     });
     return this;
   }
-
   //
   // standard shutdown handler
   //
