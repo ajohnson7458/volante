@@ -13,8 +13,8 @@ class Spoke {
 		this.name = mod.name;
 		
 		this.$addMethods(mod);
-		this.$addEvents(mod);
 		this.$addProps(mod);
+		this.$addEvents(mod);
 
 		if (mod.init) {
 	    // call init() method
@@ -38,7 +38,14 @@ class Spoke {
 		}
 		
     this.$hub.on(`${this.name}.props`, (props) => {
-      Object.assign(this, props);
+			// only allow updating a prop if it was originally in the props
+			for (let [k,v] of Object.entries(props)) {
+				if (this.$propKeys.indexOf(k) >= 0) {
+					this[k] = v;
+				} else {
+					this.warn(`cannot update ${k}; not in props`);
+				}
+			}
 	    // call updated() method if it exists
 			if (mod.updated) {
 		    mod.updated.bind(this)();
@@ -52,6 +59,8 @@ class Spoke {
 	$addProps(mod) {
 		if (mod.props) {
 			Object.assign(this, mod.props);
+			// save off keys to validate .props event
+			this.$propKeys = Object.keys(mod.props);
 		}
 	}
 	//

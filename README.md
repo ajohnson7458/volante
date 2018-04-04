@@ -100,30 +100,42 @@ module.exports = {
 	name: 'ExampleSpoke',
 	init() {
 		// constructor-like initialization
-		// called after all props and methods are available on this
+		// called after all props and methods are available on this, i.e.
+		this.someProp = 'new value';
+		this.someMethod(1);
 	},
 	events: {
 		// events this Spoke subscribes to
 		'some.event'(arg) {
 			// called when Hub receives 'some.event'
-			// use methods or props
-		}
+			// can use methods or props on this, i.e.
+			this.someMethod(arg);
+		},
 	},
 	props: {
 		// properties added to Spoke's this instance
 		// they are automatically updated when Hub receives
 		// an 'ExampleSpoke.props' event (i.e. `${this.name}.props`)
-		someProp: true
+		someProp: true,
+		counter: 0,
 	},
 	updated() {
-		// called after props are updated in response to
+		// called automatically after props are updated in response to the
 		// 'ExampleSpoke.props' event (see props)
+		this.someMethod(this.someProp);
 	},
 	methods: {
-		// methods added to Spoke's this instance
-		someMethod() {
+		// methods are added to Spoke's this instance (watch for name collisions with props)
+		someMethod(arg) {
 			// do stuff
-		}
+			this.someProp = arg;
+
+			// log stuff
+			this.log('called someMethod');
+			
+			// send events
+			this.$emit('ExampleSpoke.ready', this.someProp);
+		},
 	}
 }
 ```
