@@ -4,7 +4,7 @@ Volante is a flexible, event-centric framework which facilitates a zero-configur
 
 ## Features
 
-- super-lightweight (no build-step, no dependencies)
+- super-lightweight (no build-step, no dependencies other than Node.js >= 7)
 - zero-configuration as a goal
 - automatic volante module loading (matched using 'volante' npm keyword)
 - built-in logging methods (logging output delegated to volante spoke modules)
