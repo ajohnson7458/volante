@@ -9,9 +9,9 @@ class Spoke {
   constructor(hub, mod) {
     // save reference to hub
     this.$hub = hub;
-		
+
 		this.name = mod.name;
-		
+
 		this.$addMethods(mod);
 		this.$addProps(mod);
 		this.$addEvents(mod);
@@ -36,14 +36,14 @@ class Spoke {
 		for (let [k,v] of Object.entries(mod.events)) {
 			this.$hub.on(k, v.bind(this));
 		}
-		
+
     this.$hub.on(`${this.name}.props`, (props) => {
 			// only allow updating a prop if it was originally in the props
 			for (let [k,v] of Object.entries(props)) {
 				if (this.$propKeys.indexOf(k) >= 0) {
 					this[k] = v;
 				} else {
-					this.warn(`cannot update ${k}; not in props`);
+					this.$warn(`cannot update ${k}; not in props`);
 				}
 			}
 	    // call updated() method if it exists
@@ -51,7 +51,7 @@ class Spoke {
 		    mod.updated.bind(this)();
 			}
     });
-		
+
 	}
 	//
 	// Merge props from SDO to this instance
@@ -73,7 +73,7 @@ class Spoke {
   // If no message is provided, enable debug on this handler, otherwise
   // this function will emit a log event if debug is enabled.
   //
-  debug(msg) {
+  $debug(msg) {
     this.$hub.debug(msg, this.name);
     return this;
   }
@@ -81,7 +81,7 @@ class Spoke {
   //
   // Standard log message handler
   //
-  log(msg) {
+  $log(msg) {
     this.$hub.log(msg, this.name);
     return this;
   }
@@ -89,7 +89,7 @@ class Spoke {
   //
   // Warning message handler
   //
-  warn(msg) {
+  $warn(msg) {
     this.$hub.warn(msg, this.name);
     return this;
   }
@@ -97,11 +97,17 @@ class Spoke {
   //
   // error handler
   //
-  error(err) {
+  $error(err) {
     this.$hub.error(err, this.name);
     return this;
   }
 
+	//
+	// shutdown request
+	//
+	$shutdown() {
+		this.$hub.shutdown(this.name);
+	}
 }
 
 //

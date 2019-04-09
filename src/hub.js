@@ -9,9 +9,10 @@ const Spoke = require('./spoke');
 class Hub extends EventEmitter {
   constructor() {
     super();
-		
+
+    this.name = 'VolanteHub';
 		this.version = module.parent.exports.version;
-		
+
     // all loaded volante modules
     this.spokes = [];
 
@@ -44,11 +45,11 @@ class Hub extends EventEmitter {
         }
 
 				// make sure it has all the required fields
-        if (pkg.name && 
-					  pkg.version && 
-					  pkg.description && 
-					  pkg['keywords'] && 
-					  pkg['keywords'].indexOf(module.parent.exports.moduleKeyword) !== -1) {
+        if (pkg.name &&
+					  pkg.version &&
+					  pkg.description &&
+					  pkg.keywords &&
+					  pkg.keywords.indexOf(module.parent.exports.moduleKeyword) !== -1) {
           this.attach(pkg.name);
         }
       }
@@ -115,7 +116,7 @@ class Hub extends EventEmitter {
   // If no message is provided, enable debug mode on the hub, otherwise
   // this function will emit a log event if debug is enabled.
   //
-  debug(msg, src=this.constructor.name) {
+  debug(msg, src=this.name) {
     if (msg === undefined) {
       // no argument, enable debug
       this.isDebug = true;
@@ -134,7 +135,7 @@ class Hub extends EventEmitter {
   //
   // normal log message handler
   //
-  log(msg, src=this.constructor.name) {
+  log(msg, src=this.name) {
     this.emit('volante.log', {
       lvl: 'normal',
       src: src,
@@ -145,7 +146,7 @@ class Hub extends EventEmitter {
   //
   // warning log message handler
   //
-  warn(msg, src=this.constructor.name) {
+  warn(msg, src=this.name) {
     this.emit('volante.log', {
       lvl: 'warning',
       src: src,
@@ -156,7 +157,7 @@ class Hub extends EventEmitter {
   //
   // error handler
   //
-  error(err, src=this.constructor.name) {
+  error(err, src=this.name) {
     // keep this event as 'error' to take advantage of the checks that
     // make sure the event is handled.
     this.emit('error', {
@@ -169,7 +170,8 @@ class Hub extends EventEmitter {
   //
   // standard shutdown handler
   //
-  shutdown() {
+  shutdown(src=this.name) {
+    console.warn(`shutdown requested by ${src}`);
     this.emit('volante.shutdown');
     for (let s of this.spokes) {
       s.instance.done();
