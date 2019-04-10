@@ -1,7 +1,7 @@
 {
   "name": "volante",
   "description": "framework for flexible applications",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "author": "Mike Smiley <msmiley@alumni.rice.edu>",
   "url": "https://github.com/msmiley/volante",
   "repository": "msmiley/volante.git",
