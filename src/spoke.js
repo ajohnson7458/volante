@@ -37,7 +37,8 @@ class Spoke {
 			this.$hub.on(k, v.bind(this));
 		}
 
-    this.$hub.on(`${this.name}.props`, (props) => {
+		// add .update handler to modify module props
+    this.$hub.on(`${this.name}.update`, (props) => {
 			// only allow updating a prop if it was originally in the props
 			for (let [k,v] of Object.entries(props)) {
 				if (this.$propKeys.indexOf(k) >= 0) {
