@@ -71,7 +71,7 @@ class Spoke {
 		this.$hub.emit(...args);
 	}
   //
-  // If no message is provided, enable debug on this handler, otherwise
+  // If no message is provided, enable debug, otherwise
   // this function will emit a log event if debug is enabled.
   //
   $debug(msg) {

@@ -98,9 +98,9 @@ class Hub extends EventEmitter {
       return; // invalid module, skip
     }
     if (version) {
-      this.debug(`attached ${mod.name} v${version}`);
+      this.log(`attached ${mod.name} v${version}`);
     } else {
-      this.debug(`attached ${mod.name}`);
+      this.log(`attached ${mod.name}`);
     }
     this.emit('volante.attached', mod.name);
     return this;
