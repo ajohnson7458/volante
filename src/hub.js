@@ -50,7 +50,7 @@ class Hub extends EventEmitter {
 					  pkg.description &&
 					  pkg.keywords &&
 					  pkg.keywords.indexOf(module.parent.exports.moduleKeyword) !== -1) {
-          this.attach(pkg.name);
+          this.attach(pkg.name, pkg.version);
         }
       }
     });
@@ -61,10 +61,10 @@ class Hub extends EventEmitter {
   // standard attach function, provide Volante Spoke module name which is assumed
   // to be installed in local node_modules directory
   //
-  attach(name) {
-    this.debug(`attaching ${name}`);
+  attach(name, version) {
+    this.debug(`attaching ${name} v${version}`);
     var modPath = path.join(this.nodeModulesPath, name);
-    this.attachByFullPath(modPath);
+    this.attachByFullPath(modPath, version);
   }
   //
   // attach local/relative Volante Spoke module
@@ -77,7 +77,7 @@ class Hub extends EventEmitter {
   //
   // attach Volante Spoke module by providing fully resolved path
   //
-  attachByFullPath(modPath) {
+  attachByFullPath(modPath, version) {
     // load volante module
     try {
       var mod = require(modPath);
@@ -97,7 +97,11 @@ class Hub extends EventEmitter {
       console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
       return; // invalid module, skip
     }
-    this.debug(`attached ${mod.name} v${mod.version}`);
+    if (version) {
+      this.debug(`attached ${mod.name} v${version}`);
+    } else {
+      this.debug(`attached ${mod.name}`);
+    }
     this.emit('volante.attached', mod.name);
     return this;
   }
