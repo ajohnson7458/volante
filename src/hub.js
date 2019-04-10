@@ -97,7 +97,7 @@ class Hub extends EventEmitter {
       console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
       return; // invalid module, skip
     }
-    this.debug(`attached ${mod.name}`);
+    this.debug(`attached ${mod.name} v${mod.version}`);
     this.emit('volante.attached', mod.name);
     return this;
   }
