@@ -91,7 +91,7 @@ All Volante built-in events (except for `error`) are namespaced with `volante.` 
 
 ## Volante Spokes
 
-Volante modules are called Spokes and simply export an object with some predefined members. The object is automatically parsed and instantiated into the Volante framework.
+Volante modules are called Spokes and simply export an object with some predefined members. The object is automatically parsed and instantiated into the Volante framework. The API is heavily influenced by the Vue.js-v2 frontend framework.
 
 ### Example Spoke Definition
 
@@ -104,8 +104,11 @@ module.exports = {
 		this.someProp = 'new value';
 		this.someMethod(1);
 	},
+	done() {
+		// destructor-like de-initialization
+	},
 	events: {
-		// events this Spoke subscribes to
+		// events this Spoke subscribes to, can be from this spoke or volante-wide
 		'some.event'(arg) {
 			// called when Hub receives 'some.event'
 			// can use methods or props on this, i.e.
@@ -113,26 +116,26 @@ module.exports = {
 		},
 	},
 	props: {
-		// properties added to Spoke's this instance
-		// they are automatically updated when Hub receives
-		// an 'ExampleSpoke.props' event (i.e. `${this.name}.props`)
+		// properties added to Spoke instance
+		// they are automatically updated when Hub distributes
+		// an 'ExampleSpoke.update' event (i.e. `${this.name}.update`)
 		someProp: true,
 		counter: 0,
 	},
 	updated() {
 		// called automatically after props are updated in response to the
-		// 'ExampleSpoke.props' event (see props)
+		// 'ExampleSpoke.update' event (see props)
 		this.someMethod(this.someProp);
 	},
 	methods: {
-		// methods are added to Spoke's this instance (watch for name collisions with props)
+		// methods are added to Spoke instance (watch for name collisions with props)
 		someMethod(arg) {
 			// do stuff
 			this.someProp = arg;
 
 			// log stuff
 			this.log('called someMethod');
-			
+
 			// send events
 			this.$emit('ExampleSpoke.ready', this.someProp);
 		},
@@ -145,11 +148,11 @@ module.exports = {
 - `$emit` - emit an event across volante
 
 ### Built-in Methods
-- `log(Object)` - normal-level log messages
-- `debug(Object)` - debug-level log
-- `warn(Object)` - warning-level log
-- `error(Object)` - log an error
-- `shutdown()` - request a shutdown
+- `$log(Object)` - normal-level log messages
+- `$debug(Object)` - debug-level log
+- `$warn(Object)` - warning-level log
+- `$error(Object)` - log an error
+- `$shutdown()` - request a shutdown
 
 ## License
 

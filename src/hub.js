@@ -88,10 +88,10 @@ class Hub extends EventEmitter {
 
     // see if the spoke at least has a name
     if (mod.name) {
-      var newspoke = new Spoke(this, mod);
+      var newSpoke = new Spoke(this, mod);
       this.spokes.push({
         name: mod.name,
-        instance: newspoke
+        instance: newSpoke
       });
     } else {
       console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
@@ -174,7 +174,7 @@ class Hub extends EventEmitter {
     console.warn(`shutdown requested by ${src}`);
     this.emit('volante.shutdown');
     for (let s of this.spokes) {
-      s.instance.done();
+      s.instance.done && s.instance.done();
     }
     this.emit('volante.done');
     process.exit(0);
