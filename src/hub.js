@@ -62,7 +62,7 @@ class Hub extends EventEmitter {
   // to be installed in local node_modules directory
   //
   attach(name, version) {
-    this.debug(`attaching ${name} v${version}`);
+    this.debug(this.name, `attaching ${name} v${version}`);
     var modPath = path.join(this.nodeModulesPath, name);
     this.attachByFullPath(modPath, version);
   }
@@ -70,7 +70,7 @@ class Hub extends EventEmitter {
   // attach local/relative Volante Spoke module
   //
   attachLocal(name) {
-    this.debug(`attaching local module ${name}`);
+    this.debug(this.name, `attaching local module ${name}`);
     var modPath = path.join(module.parent.exports.parentRoot, name);
     this.attachByFullPath(modPath);
   }
@@ -98,9 +98,9 @@ class Hub extends EventEmitter {
       return; // invalid module, skip
     }
     if (version) {
-      this.log(`attached ${mod.name} v${version}`);
+      this.log(this.name, `attached ${mod.name} v${version}`);
     } else {
-      this.log(`attached ${mod.name}`);
+      this.log(this.name, `attached ${mod.name}`);
     }
     this.emit('volante.attached', mod.name);
     return this;
@@ -120,8 +120,8 @@ class Hub extends EventEmitter {
   // If no message is provided, enable debug mode on the hub, otherwise
   // this function will emit a log event if debug is enabled.
   //
-  debug(msg, src=this.name) {
-    if (msg === undefined) {
+  debug(src=this.name, ...args) {
+    if (arguments.length === 0) {
       // no argument, enable debug
       this.isDebug = true;
     } else {
@@ -130,7 +130,7 @@ class Hub extends EventEmitter {
         this.emit('volante.log', {
           lvl: 'debug',
           src: src,
-          msg: msg
+          msg: args
         });
       }
     }
@@ -139,35 +139,35 @@ class Hub extends EventEmitter {
   //
   // normal log message handler
   //
-  log(msg, src=this.name) {
+  log(src=this.name, ...args) {
     this.emit('volante.log', {
       lvl: 'normal',
       src: src,
-      msg: msg
+      msg: args
     });
     return this;
   }
   //
   // warning log message handler
   //
-  warn(msg, src=this.name) {
+  warn(src=this.name, ...args) {
     this.emit('volante.log', {
       lvl: 'warning',
       src: src,
-      msg: msg
+      msg: args
     });
     return this;
   }
   //
   // error handler
   //
-  error(err, src=this.name) {
+  error(src=this.name, ...args) {
     // keep this event as 'error' to take advantage of the checks that
     // make sure the event is handled.
     this.emit('error', {
       lvl: 'error',
       src: src,
-      msg: err
+      msg: args
     });
     return this;
   }

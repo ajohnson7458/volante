@@ -70,36 +70,44 @@ class Spoke {
 	$emit(...args) {
 		this.$hub.emit(...args);
 	}
+	//
+	// Proxy the Hub's isDebug property. Useful for minimizing debug log
+	// performance impace by not calling $debug() or rendering its arguments
+	// (e.g. this.$isDebug && this.$debug(...))
+	//
+	$isDebug() {
+		return this.$hub.isDebug;
+	}
   //
   // If no message is provided, enable debug, otherwise
   // this function will emit a log event if debug is enabled.
   //
-  $debug(msg) {
-    this.$hub.debug(msg, this.name);
+  $debug(...args) {
+    this.$hub.debug(this.name, ...args);
     return this;
   }
 
   //
   // Standard log message handler
   //
-  $log(msg) {
-    this.$hub.log(msg, this.name);
+  $log(...args) {
+    this.$hub.log(this.name, ...args);
     return this;
   }
 
   //
   // Warning message handler
   //
-  $warn(msg) {
-    this.$hub.warn(msg, this.name);
+  $warn(...args) {
+    this.$hub.warn(this.name, ...args);
     return this;
   }
 
   //
   // error handler
   //
-  $error(err) {
-    this.$hub.error(err, this.name);
+  $error(...args) {
+    this.$hub.error(this.name, ...args);
     return this;
   }
 
