@@ -15,6 +15,7 @@ class Spoke {
 		this.$addMethods(mod);
 		this.$addProps(mod);
 		this.$addEvents(mod);
+		this.$addData(mod);
 
 		if (mod.init) {
 	    // call init() method
@@ -65,6 +66,14 @@ class Spoke {
 			Object.assign(this, mod.props);
 			// save off keys to validate .props event
 			this.$propKeys = Object.keys(mod.props);
+		}
+	}
+	//
+	// Merge data from SDO to this instance
+	//
+	$addData(mod) {
+		if (mod.data) {
+			Object.assign(this, mod.data);
 		}
 	}
 	//

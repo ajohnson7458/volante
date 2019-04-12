@@ -122,6 +122,11 @@ module.exports = {
 		someProp: true,
 		counter: 0,
 	},
+	data: {
+		// "private" data members for Spoke instance, not meant to be changed from
+		// outside the module
+		privData: [1,2,3],
+	},
 	updated() {
 		// called automatically after props are updated in response to the
 		// 'ExampleSpoke.update' event (see props)
