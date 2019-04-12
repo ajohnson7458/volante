@@ -25,34 +25,37 @@ class Spoke {
 	// Add methods specified in SDO to this instance
 	//
 	$addMethods(mod) {
-		for (let [k,v] of Object.entries(mod.methods)) {
-			this[k] = v;
+		if (mod.methods) {
+			for (let [k,v] of Object.entries(mod.methods)) {
+				this[k] = v;
+			}
 		}
 	}
 	//
 	// Add handlers to $hub for events specified in SDO and for props
 	//
 	$addEvents(mod) {
-		for (let [k,v] of Object.entries(mod.events)) {
-			this.$hub.on(k, v.bind(this));
-		}
+		if (mod.events) {
+			for (let [k,v] of Object.entries(mod.events)) {
+				this.$hub.on(k, v.bind(this));
+			}
 
-		// add .update handler to modify module props
-    this.$hub.on(`${this.name}.update`, (props) => {
-			// only allow updating a prop if it was originally in the props
-			for (let [k,v] of Object.entries(props)) {
-				if (this.$propKeys.indexOf(k) >= 0) {
-					this[k] = v;
-				} else {
-					this.$warn(`cannot update ${k}; not in props`);
+			// add .update handler to modify module props
+	    this.$hub.on(`${this.name}.update`, (props) => {
+				// only allow updating a prop if it was originally in the props
+				for (let [k,v] of Object.entries(props)) {
+					if (this.$propKeys.indexOf(k) >= 0) {
+						this[k] = v;
+					} else {
+						this.$warn(`cannot update ${k}; not in props`);
+					}
 				}
-			}
-	    // call updated() method if it exists
-			if (mod.updated) {
-		    mod.updated.bind(this)();
-			}
-    });
-
+		    // call updated() method if it exists
+				if (mod.updated) {
+			    mod.updated.bind(this)();
+				}
+	    });
+		}
 	}
 	//
 	// Merge props from SDO to this instance
