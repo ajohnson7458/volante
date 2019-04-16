@@ -39,7 +39,7 @@ some_module.some_method();
 - `log(Object)` - normal-level log messages
 - `debug(Object)` - debug-level log, also enables debug mode when called without an argument
 - `warn(Object)` - log a warning
-- `error(Object)` - log an error
+- `error(Object)` - log an error, also returns a new Error ready for throw
 - `shutdown()` - shutdown Volante
 
 ### Events emitted by `volante.Hub`
@@ -156,7 +156,7 @@ module.exports = {
 - `$log(Object)` - normal-level log messages
 - `$debug(Object)` - debug-level log
 - `$warn(Object)` - warning-level log
-- `$error(Object)` - log an error
+- `$error(Object)` - log an error, return a new Error ready to throw
 - `$shutdown()` - request a shutdown
 
 ## License

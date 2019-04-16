@@ -124,7 +124,7 @@ class Spoke {
   //
   $error(...args) {
     this.$hub.error(this.name, ...args);
-    return this;
+    return new Error(`${this.name}: ${args.join(',')}`);
   }
 
 	//

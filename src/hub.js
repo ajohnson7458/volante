@@ -172,7 +172,7 @@ class Hub extends EventEmitter {
     return this;
   }
   //
-  // standard shutdown handler
+  // shutdown handler
   //
   shutdown(src=this.name) {
     this.warn(this.name, `shutdown requested by ${src}`);
