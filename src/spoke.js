@@ -21,6 +21,10 @@ class Spoke {
 	    // call init() method
 	    mod.init.bind(this)();
 		}
+		if (mod.done) {
+			// bind done() for later
+			this.done = mod.done.bind(this);
+		}
   }
 	//
 	// Add methods specified in SDO to this instance

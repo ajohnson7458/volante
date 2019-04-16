@@ -120,7 +120,7 @@ class Hub extends EventEmitter {
   // If no message is provided, enable debug mode on the hub, otherwise
   // this function will emit a log event if debug is enabled.
   //
-  debug(src=this.name, ...args) {
+  debug(src, ...args) {
     if (arguments.length === 0) {
       // no argument, enable debug
       this.isDebug = true;
@@ -139,7 +139,7 @@ class Hub extends EventEmitter {
   //
   // normal log message handler
   //
-  log(src=this.name, ...args) {
+  log(src, ...args) {
     this.emit('volante.log', {
       lvl: 'normal',
       src: src,
@@ -150,7 +150,7 @@ class Hub extends EventEmitter {
   //
   // warning log message handler
   //
-  warn(src=this.name, ...args) {
+  warn(src, ...args) {
     this.emit('volante.log', {
       lvl: 'warning',
       src: src,
@@ -161,7 +161,7 @@ class Hub extends EventEmitter {
   //
   // error handler
   //
-  error(src=this.name, ...args) {
+  error(src, ...args) {
     // keep this event as 'error' to take advantage of the checks that
     // make sure the event is handled.
     this.emit('error', {
@@ -175,13 +175,16 @@ class Hub extends EventEmitter {
   // standard shutdown handler
   //
   shutdown(src=this.name) {
-    console.warn(`shutdown requested by ${src}`);
+    this.warn(this.name, `shutdown requested by ${src}`);
     this.emit('volante.shutdown');
     for (let s of this.spokes) {
       s.instance.done && s.instance.done();
     }
     this.emit('volante.done');
-    process.exit(0);
+    setTimeout(() => {
+      console.warn('done.');
+      process.exit(0);
+    }, 1000);
   }
 }
 
