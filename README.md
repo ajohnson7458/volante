@@ -19,11 +19,17 @@ const volante = require('volante');
 let hub = new volante.Hub().attachAll(); // attachAll automatically finds all local Volante modules
 
 // various events/handlers
-hub.emit(...);
-hub.on(...);
+hub.emit('VolanteExpress.update', {
+  bind: '127.0.0.1',
+  port: 3000,
+});
+
+hub.on('VolanteExpress.listening', () => {
+  console.log('my server is running')
+});
 
 // to access an instance directly, use:
-let some_module = hub.getInstance('some-volante-module');
+let some_module = hub.getInstance('some-volante-module-by-npm-name');
 some_module.some_method();
 
 ```
@@ -36,10 +42,6 @@ some_module.some_method();
 - `attachAll()` - find all valid Volante modules
 - `attach(name)` - attach Volante module by name
 - `getInstance(name)` - get a Spoke instance by module name
-- `log(Object)` - normal-level log messages
-- `debug(Object)` - debug-level log, also enables debug mode when called without an argument
-- `warn(Object)` - log a warning
-- `error(Object)` - log an error, also returns a new Error ready for throw
 - `shutdown()` - shutdown Volante
 
 ### Events emitted by `volante.Hub`
@@ -101,7 +103,7 @@ module.exports = {
 	init() {
 		// constructor-like initialization
 		// called after all props and methods are available on this, i.e.
-		this.someProp = 'new value';
+		this.privData = [0];
 		this.someMethod(1);
 	},
 	done() {
@@ -111,7 +113,7 @@ module.exports = {
 		// events this Spoke subscribes to, can be from this spoke or volante-wide
 		'some.event'(arg) {
 			// called when Hub receives 'some.event'
-			// can use methods or props on this, i.e.
+			// can use methods, props, or data here, i.e.
 			this.someMethod(arg);
 		},
 	},
@@ -139,7 +141,7 @@ module.exports = {
 			this.someProp = arg;
 
 			// log stuff
-			this.log('called someMethod');
+			this.$log('called someMethod');
 
 			// send events
 			this.$emit('ExampleSpoke.ready', this.someProp);
@@ -153,10 +155,10 @@ module.exports = {
 - `$emit` - emit an event across volante
 
 ### Built-in Methods
-- `$log(Object)` - normal-level log messages
-- `$debug(Object)` - debug-level log
-- `$warn(Object)` - warning-level log
-- `$error(Object)` - log an error, return a new Error ready to throw
+- `$log(...)` - normal-level log messages
+- `$debug(...)` - debug-level log
+- `$warn(...)` - warning-level log
+- `$error(...)` - log an error, return a new Error ready to throw
 - `$shutdown()` - request a shutdown
 
 ## License

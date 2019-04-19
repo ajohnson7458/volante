@@ -102,7 +102,6 @@ class Spoke {
     this.$hub.debug(this.name, ...args);
     return this;
   }
-
   //
   // Standard log message handler
   //
@@ -110,7 +109,6 @@ class Spoke {
     this.$hub.log(this.name, ...args);
     return this;
   }
-
   //
   // Warning message handler
   //
@@ -118,7 +116,6 @@ class Spoke {
     this.$hub.warn(this.name, ...args);
     return this;
   }
-
   //
   // error handler
   //
@@ -126,7 +123,6 @@ class Spoke {
     this.$hub.error(this.name, ...args);
     return new Error(`${this.name}: ${args.join(',')}`);
   }
-
 	//
 	// shutdown request
 	//
