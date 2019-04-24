@@ -40,7 +40,6 @@ class Hub extends EventEmitter {
         try {
           var pkg = require(pkgPath);
         } catch(e) {
-          console.error(`PARSING ERROR: invalid or missing package.json: ${pkgPath}`);
           return; // no (or invalid) package.json, skip
         }
 
@@ -81,30 +80,46 @@ class Hub extends EventEmitter {
     // load volante module
     try {
       var mod = require(modPath);
+	   	// see if the spoke at least has a name
+	    if (mod.name) {
+	      var newSpoke = new Spoke(this, mod);
+	      this.spokes.push({
+	        name: mod.name,
+	        instance: newSpoke
+	      });
+		    if (version) {
+		      this.log(this.name, `attached ${mod.name} v${version}`);
+		    } else {
+		      this.log(this.name, `attached ${mod.name}`);
+		    }
+		    this.emit('volante.attached', mod.name);
+	    } else {
+	      console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
+	    }
     } catch (e) {
       console.error(`ATTACH ERROR: ${e}`);
-      return; // invalid module, skip
     }
-
-    // see if the spoke at least has a name
-    if (mod.name) {
-      var newSpoke = new Spoke(this, mod);
-      this.spokes.push({
-        name: mod.name,
-        instance: newSpoke
-      });
-    } else {
-      console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
-      return; // invalid module, skip
-    }
-    if (version) {
-      this.log(this.name, `attached ${mod.name} v${version}`);
-    } else {
-      this.log(this.name, `attached ${mod.name}`);
-    }
-    this.emit('volante.attached', mod.name);
     return this;
   }
+	//
+	// Attach a Spoke module by using the provided
+	// Spoke Definition Object directly
+	//
+	attachFromObject(obj) {
+    this.debug(this.name, `attaching module from object`);
+		// see if the provided object at least has a name
+    if (obj.name) {
+      var newSpoke = new Spoke(this, obj);
+      this.spokes.push({
+        name: obj.name,
+        instance: newSpoke
+      });
+			this.log(this.name, `attached module from object ${obj.name}`);
+    } else {
+      console.error(`ATTACH ERROR: spoke definition ${obj} has no name`);
+    }
+		return this
+	}
   //
   // get the instance of the spoke with the given module name
   //
