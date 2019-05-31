@@ -15,6 +15,8 @@ class Hub extends EventEmitter {
 
     // all loaded volante modules
     this.spokes = [];
+    // spokes which registered for all ('*') events
+    this.starSpokes = [];
 
     // debug flag
     this.isDebug = false;
@@ -118,7 +120,7 @@ class Hub extends EventEmitter {
     } else {
       console.error(`ATTACH ERROR: spoke definition ${obj} has no name`);
     }
-		return this
+		return this;
 	}
   //
   // get the instance of the spoke with the given module name
@@ -143,6 +145,7 @@ class Hub extends EventEmitter {
       // log only if debug was enabled
       if (this.isDebug) {
         this.emit('volante.log', {
+          ts: new Date(),
           lvl: 'debug',
           src: src,
           msg: args
@@ -156,6 +159,7 @@ class Hub extends EventEmitter {
   //
   log(src, ...args) {
     this.emit('volante.log', {
+      ts: new Date(),
       lvl: 'normal',
       src: src,
       msg: args
@@ -167,6 +171,7 @@ class Hub extends EventEmitter {
   //
   warn(src, ...args) {
     this.emit('volante.log', {
+      ts: new Date(),
       lvl: 'warning',
       src: src,
       msg: args
@@ -180,6 +185,7 @@ class Hub extends EventEmitter {
     // keep this event as 'error' to take advantage of the checks that
     // make sure the event is handled.
     this.emit('error', {
+      ts: new Date(),
       lvl: 'error',
       src: src,
       msg: args
@@ -200,6 +206,22 @@ class Hub extends EventEmitter {
       console.warn('done.');
       process.exit(0);
     }, 1000);
+  }
+  //
+  // called by spoke.js to register a spoke to receive all events ('*')
+  //
+  onAll(f) {
+    this.starSpokes.push(f);
+  }
+  //
+  // volante hub event middleware, currently we only send to any spokes
+  // which registered for '*' (all events)
+  //
+  emit(type, ...args) {
+    // send to any spokes which registered for '*'
+    this.starSpokes.forEach(f => f(type, ...args));
+    // emit using EventEmitter
+    super.emit(type, ...args);
   }
 }
 

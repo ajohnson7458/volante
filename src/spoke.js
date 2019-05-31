@@ -42,7 +42,13 @@ class Spoke {
 	$addEvents(mod) {
 		if (mod.events) {
 			for (let [k,v] of Object.entries(mod.events)) {
-				this.$hub.on(k, v.bind(this));
+				if (k === '*') {
+					// tell hub to treat us as a star spoke
+					this.$hub.onAll(v.bind(this));
+				} else {
+					// traditional event register
+					this.$hub.on(k, v.bind(this));
+				}
 			}
 
 			// add .update handler to modify module props

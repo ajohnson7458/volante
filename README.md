@@ -59,6 +59,7 @@ All Volante built-in events (except for `error`) are namespaced with `volante.` 
 - `volante.log` - normal log level event
   ```js
   {
+  	ts: Date,
     lvl: 'normal',
     src: String, // Spoke class name
     msg: String
@@ -67,6 +68,7 @@ All Volante built-in events (except for `error`) are namespaced with `volante.` 
 - `volante.debug` - debug log level event
   ```js
   {
+  	ts: Date,
     lvl: 'debug',
     src: String, // Spoke class name
     msg: String
@@ -75,6 +77,7 @@ All Volante built-in events (except for `error`) are namespaced with `volante.` 
 - `volante.warn` - warning log level event
   ```js
   {
+  	ts: Date,
     lvl: 'warning',
     src: String, // Spoke class name
     msg: String
@@ -83,6 +86,7 @@ All Volante built-in events (except for `error`) are namespaced with `volante.` 
 - `error` - error log event
   ```js
   {
+  	ts: Date,
     lvl: 'error',
     src: String, // Spoke class name
     msg: String
