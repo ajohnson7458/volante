@@ -218,6 +218,13 @@ class Hub extends EventEmitter {
   // which registered for '*' (all events)
   //
   emit(type, ...args) {
+    // remove any functions from args, not supported for star spokes
+    let saniArgs = [];
+    for (let a of args) {
+      if (typeof(a) !== 'function') {
+        saniArgs.push(a);
+      }
+    }
     // send to any spokes which registered for '*'
     this.starSpokes.forEach(f => f(type, ...args));
     // emit using EventEmitter
