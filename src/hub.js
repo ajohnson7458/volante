@@ -225,8 +225,8 @@ class Hub extends EventEmitter {
         saniArgs.push(a);
       }
     }
-    // send to any spokes which registered for '*'
-    this.starSpokes.forEach(f => f(type, ...args));
+    // send sanitized args to any spokes which registered for '*'
+    this.starSpokes.forEach(f => f(type, ...saniArgs));
     // emit using EventEmitter
     super.emit(type, ...args);
   }
