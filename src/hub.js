@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const EventEmitter = require('events').EventEmitter;
 const Spoke = require('./spoke');
+const utils = require('./utils');
 
 //
 // Hub provides a base class and reference implementation for a volante Hub.
@@ -12,6 +13,7 @@ class Hub extends EventEmitter {
 
     this.name = 'VolanteHub';
 		this.version = module.parent.exports.version;
+		this.startTime = new Date();
 
     // all loaded volante modules
     this.spokes = [];
@@ -63,7 +65,11 @@ class Hub extends EventEmitter {
   // to be installed in local node_modules directory
   //
   attach(name, version) {
-    this.debug(this.name, `attaching ${name} v${version}`);
+    if (version) {
+      this.debug(this.name, `attaching ${name} v${version}`);
+    } else {
+      this.debug(this.name, `attaching ${name}`);
+    }
     var modPath = path.join(this.nodeModulesPath, name);
     this.attachByFullPath(modPath, version);
   }
@@ -87,6 +93,7 @@ class Hub extends EventEmitter {
 	      var newSpoke = new Spoke(this, mod);
 	      this.spokes.push({
 	        name: mod.name,
+	        version: version ? version:'unknown',
 	        instance: newSpoke
 	      });
 		    if (version) {
@@ -229,6 +236,31 @@ class Hub extends EventEmitter {
     this.starSpokes.forEach(f => f(type, ...saniArgs));
     // emit using EventEmitter
     super.emit(type, ...args);
+  }
+  //
+  // get topology of volante wheel, this iterates through every spoke and copies
+  // its props and data, so don't call it too often
+  //
+  getAttached() {
+    let ret = [];
+    for (let s of this.spokes) {
+
+      ret.push({
+        name: s.name,
+        version: s.version,
+        props: utils.selectProps(s.instance, s.instance.$propKeys),
+        data: utils.selectProps(s.instance, s.instance.$dataKeys),
+        handledEvents: s.instance.handledEvents,
+        emittedEvents: s.instance.emittedEvents,
+      });
+    }
+    return ret;
+  }
+  //
+  // get the volante wheel uptime
+  //
+  getUptime() {
+    return (new Date()) - this.startTime;
   }
 }
 

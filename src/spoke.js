@@ -1,3 +1,5 @@
+const utils = require('./utils');
+
 //
 // Base class for a volante Spoke. Parses Spoke Definition Object (SDO)
 // and ingests into itself.
@@ -10,12 +12,18 @@ class Spoke {
     // save reference to hub
     this.$hub = hub;
 
+		// initialize metadata
 		this.name = mod.name;
+		this.handledEvents = [
+			`${this.name}.update` // all spokes have this one
+		];
+		this.emittedEvents = [];
 
 		this.$addMethods(mod);
 		this.$addProps(mod);
 		this.$addEvents(mod);
 		this.$addData(mod);
+
 
 		if (mod.init) {
 	    // call init() method
@@ -42,6 +50,7 @@ class Spoke {
 	$addEvents(mod) {
 		if (mod.events) {
 			for (let [k,v] of Object.entries(mod.events)) {
+				this.handledEvents.push(k);
 				if (k === '*') {
 					// tell hub to treat us as a star spoke
 					this.$hub.onAll(v.bind(this));
@@ -66,6 +75,22 @@ class Spoke {
 			    mod.updated.bind(this)();
 				}
 	    });
+
+	    // find all emitted events
+	    if (mod.methods) {
+		    for (let [k,v] of Object.entries(mod.methods)) {
+		    	this.emittedEvents = this.emittedEvents.concat(utils.findEmits(v.toString()));
+		    }
+	    }
+	    if (mod.init) {
+				this.emittedEvents = this.emittedEvents.concat(utils.findEmits(mod.init.toString()));
+	    }
+	    if (mod.done) {
+				this.emittedEvents = this.emittedEvents.concat(utils.findEmits(mod.done.toString()));
+	    }
+	    if (mod.updated) {
+				this.emittedEvents = this.emittedEvents.concat(utils.findEmits(mod.updated.toString()));
+	    }
 		}
 	}
 	//
@@ -76,6 +101,8 @@ class Spoke {
 			Object.assign(this, mod.props);
 			// save off keys to validate .props event
 			this.$propKeys = Object.keys(mod.props);
+		} else {
+			this.$propKeys = [];
 		}
 	}
 	//
@@ -84,6 +111,10 @@ class Spoke {
 	$addData(mod) {
 		if (mod.data) {
 			Object.assign(this, mod.data);
+			// save off keys to use for introspection
+			this.$dataKeys = Object.keys(mod.data);
+		} else {
+			this.$dataKeys = [];
 		}
 	}
 	//
