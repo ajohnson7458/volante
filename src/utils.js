@@ -28,13 +28,13 @@ exports.findEmits = function(str) {
   return emits;
 };
 
-exports.cloneDeepNoFunctions = function(d) {
+exports.cloneDeepNoFunctions = function(obj) {
   let ret;
   // set up recursion for arrays and objects
-  if (d instanceof Array) {
+  if (Array.isArray(obj)) {
     ret = [];
     // iterate
-    for (let v of d) {
+    for (let v of obj) {
       if (typeof(v) === 'function') {
         continue;
       } else if (v instanceof Object || v instanceof Array) {
@@ -43,10 +43,10 @@ exports.cloneDeepNoFunctions = function(d) {
         ret.push(v);
       }
     }
-  } else if (d instanceof Object) {
+  } else if (obj instanceof Object) {
     ret = {};
     // iterate
-    for (let [k,v] of Object.entries(d)) {
+    for (let [k,v] of Object.entries(obj)) {
       if (typeof(v) === 'function') {
         continue;
       } else if (v instanceof Object || v instanceof Array) {
@@ -56,7 +56,7 @@ exports.cloneDeepNoFunctions = function(d) {
       }
     }
   } else {
-    ret = d;
+    ret = obj;
   }
   return ret;
 };

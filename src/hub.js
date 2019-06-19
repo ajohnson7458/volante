@@ -249,7 +249,6 @@ class Hub extends EventEmitter {
         name: s.name,
         version: s.version,
         props: utils.selectProps(s.instance, s.instance.$propKeys),
-        data: utils.selectProps(s.instance, s.instance.$dataKeys),
         handledEvents: s.instance.handledEvents,
         emittedEvents: s.instance.emittedEvents,
       });

@@ -111,10 +111,6 @@ class Spoke {
 	$addData(mod) {
 		if (mod.data) {
 			Object.assign(this, mod.data);
-			// save off keys to use for introspection
-			this.$dataKeys = Object.keys(mod.data);
-		} else {
-			this.$dataKeys = [];
 		}
 	}
 	//
