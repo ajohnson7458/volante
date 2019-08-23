@@ -191,7 +191,7 @@ class Hub extends EventEmitter {
   error(src, ...args) {
     // keep this event as 'error' to take advantage of the checks that
     // make sure the event is handled.
-    this.emit('error', {
+    this.emit('volante.error', {
       ts: new Date(),
       lvl: 'error',
       src: src,

@@ -41,12 +41,14 @@ some_module.some_method();
 - `emit()` - EventEmitter-provided `emit`
 - `attachAll()` - find all valid Volante modules
 - `attach(name)` - attach Volante module by name
+- `attachLocal(path)` - attach a local JS module
+- `attachFromObject(obj)` - load a JS object as a Spoke
 - `getInstance(name)` - get a Spoke instance by module name
 - `shutdown()` - shutdown Volante
 
 ### Events emitted by `volante.Hub`
 
-All Volante built-in events (except for `error`) are namespaced with `volante.` They are listed below along with the data item emitted with the event.
+All Volante built-in events are namespaced with `volante.` They are listed below along with the data item emitted with the event.
 
 - `volante.attachedAll` - all Spokes attached using .attachAll()
   ```js
@@ -83,7 +85,7 @@ All Volante built-in events (except for `error`) are namespaced with `volante.` 
     msg: String
   }
   ```
-- `error` - error log event
+- `volante.error` - error log event
   ```js
   {
   	ts: Date,
