@@ -58,40 +58,13 @@ All Volante built-in events are namespaced with `volante.` They are listed below
   ```js
   String // name of Spoke module
   ```
-- `volante.log` - normal log level event
+- `volante.log` - log event
   ```js
   {
   	ts: Date,
-    lvl: 'normal',
+    lvl: 'normal', // or 'debug', 'warning', 'error'
     src: String, // Spoke class name
-    msg: String
-  }
-  ```
-- `volante.debug` - debug log level event
-  ```js
-  {
-  	ts: Date,
-    lvl: 'debug',
-    src: String, // Spoke class name
-    msg: String
-  }
-  ```
-- `volante.warn` - warning log level event
-  ```js
-  {
-  	ts: Date,
-    lvl: 'warning',
-    src: String, // Spoke class name
-    msg: String
-  }
-  ```
-- `volante.error` - error log event
-  ```js
-  {
-  	ts: Date,
-    lvl: 'error',
-    src: String, // Spoke class name
-    msg: String
+    msg: Any
   }
   ```
 - `volante.shutdown` - emitted when shutdown initiated
