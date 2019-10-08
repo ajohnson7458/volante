@@ -28,43 +28,18 @@ exports.findEmits = function(str) {
   return emits;
 };
 
-exports.cloneDeepNoFunctions = function(obj) {
-  let ret;
-  // set up recursion for arrays and objects
-  if (Array.isArray(obj)) {
-    ret = [];
-    // iterate
-    for (let v of obj) {
-      if (typeof(v) === 'function') {
-        continue;
-      } else if (v instanceof Object || v instanceof Array) {
-        ret.push(exports.cloneDeepNoFunctions(v));
-      } else {
-        ret.push(v);
-      }
-    }
-  } else if (obj instanceof Object) {
-    ret = {};
-    // iterate
-    for (let [k,v] of Object.entries(obj)) {
-      if (typeof(v) === 'function') {
-        continue;
-      } else if (v instanceof Object || v instanceof Array) {
-        ret[k] = exports.cloneDeepNoFunctions(v);
-      } else {
-        ret[k] = v;
-      }
-    }
-  } else {
-    ret = obj;
-  }
-  return ret;
-};
-
+//
+// clone sanitized (no functions or circular deps) members specified by keys
+// out of the given obj
+//
 exports.selectProps = function(obj, keys) {
   let ret = {};
   for (let k of keys) {
-    ret[k] = exports.cloneDeepNoFunctions(obj[k]);
+    try {
+      ret[k] = JSON.parse(JSON.stringify(obj[k]));
+    } catch(e) {
+      ret[k] = '<object with circular references>';
+    }
   }
   return ret;
 };

@@ -72,6 +72,7 @@ class Hub extends EventEmitter {
     }
     var modPath = path.join(this.nodeModulesPath, name);
     this.attachByFullPath(modPath, version);
+    return this;
   }
   //
   // attach local/relative Volante Spoke module
@@ -80,6 +81,7 @@ class Hub extends EventEmitter {
     this.debug(this.name, `attaching local module ${name}`);
     var modPath = path.join(module.parent.exports.parentRoot, name);
     this.attachByFullPath(modPath);
+    return this;
   }
   //
   // attach Volante Spoke module by providing fully resolved path
@@ -211,6 +213,7 @@ class Hub extends EventEmitter {
       console.warn('done.');
       process.exit(0);
     }, 1000);
+    return this;
   }
   //
   // called by spoke.js to register a spoke to receive all events ('*')
@@ -234,6 +237,7 @@ class Hub extends EventEmitter {
     this.starSpokes.forEach(f => f(type, ...saniArgs));
     // emit using EventEmitter
     super.emit(type, ...args);
+    return this;
   }
   //
   // get topology of volante wheel, this iterates through every spoke and copies
@@ -242,11 +246,11 @@ class Hub extends EventEmitter {
   getAttached() {
     let ret = [];
     for (let s of this.spokes) {
-
       ret.push({
         name: s.name,
         version: s.version,
         props: utils.selectProps(s.instance, s.instance.$propKeys),
+        data: utils.selectProps(s.instance, s.instance.$dataKeys),
         handledEvents: s.instance.handledEvents,
         emittedEvents: s.instance.emittedEvents,
       });

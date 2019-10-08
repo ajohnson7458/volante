@@ -105,7 +105,7 @@ module.exports = {
 	},
 	data: {
 		// "private" data members for Spoke instance, not meant to be changed from
-		// outside the module
+		// outside the module but this is not enforced
 		privData: [1,2,3],
 	},
 	updated() {

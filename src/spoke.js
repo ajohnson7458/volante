@@ -15,7 +15,7 @@ class Spoke {
 		// initialize metadata
 		this.name = mod.name;
 		this.handledEvents = [
-			`${this.name}.update` // all spokes have this one
+			`${this.name}.update(props)`, // all spokes have this one
 		];
 		this.emittedEvents = [];
 
@@ -23,7 +23,6 @@ class Spoke {
 		this.$addProps(mod);
 		this.$addEvents(mod);
 		this.$addData(mod);
-
 
 		if (mod.init) {
 	    // call init() method
@@ -50,7 +49,7 @@ class Spoke {
 	$addEvents(mod) {
 		if (mod.events) {
 			for (let [k,v] of Object.entries(mod.events)) {
-				this.handledEvents.push(k);
+				this.handledEvents.push(`${k}${v.toString().match(/\(.*\)/)[0]}`);
 				if (k === '*') {
 					// tell hub to treat us as a star spoke
 					this.$hub.onAll(v.bind(this));
@@ -78,7 +77,7 @@ class Spoke {
 
 	    // find all emitted events
 	    if (mod.methods) {
-		    for (let [k,v] of Object.entries(mod.methods)) {
+		    for (let v of Object.values(mod.methods)) {
 		    	this.emittedEvents = this.emittedEvents.concat(utils.findEmits(v.toString()));
 		    }
 	    }
@@ -111,6 +110,9 @@ class Spoke {
 	$addData(mod) {
 		if (mod.data) {
 			Object.assign(this, mod.data);
+			this.$dataKeys = Object.keys(mod.data);
+		} else {
+			this.$dataKeys = [];
 		}
 	}
 	//
