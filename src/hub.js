@@ -134,9 +134,20 @@ class Hub extends EventEmitter {
   //
   // get the instance of the spoke with the given module name
   //
-  getInstance(name) {
+  getInstanceByNpmName(name) {
     for (let s of this.spokes) {
       if (s.name === name) {
+        return s.instance;
+      }
+    }
+    return null;
+  }
+  //
+  // get the instance of the spoke with the given module name
+  //
+  getInstanceByName(name) {
+    for (let s of this.spokes) {
+      if (s.instance.name && s.instance.name === name) {
         return s.instance;
       }
     }

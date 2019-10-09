@@ -29,7 +29,7 @@ hub.on('VolanteExpress.listening', () => {
 });
 
 // to access an instance directly, use:
-let some_module = hub.getInstance('some-volante-module-by-npm-name');
+let some_module = hub.getInstanceByNpmName('some-volante-module-by-npm-name');
 some_module.some_method();
 
 ```
