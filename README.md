@@ -43,7 +43,8 @@ some_module.some_method();
 - `attach(name)` - attach Volante module by name
 - `attachLocal(path)` - attach a local JS module
 - `attachFromObject(obj)` - load a JS object as a Spoke
-- `getInstance(name)` - get a Spoke instance by module name
+- `getSpoke(name)` - get a Spoke instance by its given name (name: '<>')
+- `getSpokeByNpmName(name)` - get a Spoke instance by its npm module name
 - `shutdown()` - shutdown Volante
 
 ### Events emitted by `volante.Hub`
