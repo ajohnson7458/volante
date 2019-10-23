@@ -39,7 +39,7 @@ class Spoke {
 	$addMethods(mod) {
 		if (mod.methods) {
 			for (let [k,v] of Object.entries(mod.methods)) {
-				this[k] = v;
+				this[k] = v.bind(this);
 			}
 		}
 	}
