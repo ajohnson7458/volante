@@ -255,7 +255,12 @@ class Hub extends EventEmitter {
   // its props and data, so don't call it too often
   //
   getAttached() {
-    let ret = [];
+    let ret = [
+      {
+        name: 'Volante Hub',
+        isDebug: this.isDebug,
+      },
+    ];
     for (let s of this.spokes) {
       ret.push({
         name: s.name,
