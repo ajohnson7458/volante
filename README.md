@@ -104,10 +104,12 @@ module.exports = {
 		someProp: true,
 		counter: 0,
 	},
-	data: {
-		// "private" data members for Spoke instance, not meant to be changed from
-		// outside the module but this is not enforced
-		privData: [1,2,3],
+	data() { // as a function so it can be evaluated in context
+	  return { 
+			// "private" data members for Spoke instance, not meant to be changed from
+			// outside the module but this is not enforced
+			privData: [1,2,3],
+		};
 	},
 	updated() {
 		// called automatically after props are updated in response to the

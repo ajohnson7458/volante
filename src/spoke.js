@@ -109,8 +109,9 @@ class Spoke {
 	//
 	$addData(mod) {
 		if (mod.data) {
-			Object.assign(this, mod.data);
-			this.$dataKeys = Object.keys(mod.data);
+			// apply data function in context
+			Object.assign(this, mod.data.apply(this));
+			this.$dataKeys = Object.keys(mod.data.apply(this));
 		} else {
 			this.$dataKeys = [];
 		}
