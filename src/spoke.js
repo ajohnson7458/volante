@@ -109,9 +109,11 @@ class Spoke {
 	//
 	$addData(mod) {
 		if (mod.data) {
-			// apply data function in context
+			// apply data twice so values can settle if they are dependent
+			let appliedData = mod.data.apply(this);
+			Object.assign(this, appliedData);
 			Object.assign(this, mod.data.apply(this));
-			this.$dataKeys = Object.keys(mod.data.apply(this));
+			this.$dataKeys = Object.keys(appliedData);
 		} else {
 			this.$dataKeys = [];
 		}
