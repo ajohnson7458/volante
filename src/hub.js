@@ -108,7 +108,7 @@ class Hub extends EventEmitter {
 	      console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
 	    }
     } catch (e) {
-      console.error(`ATTACH ERROR: modPath: ${modPath} - ${e}`);
+      console.error(`ATTACH ERROR: modPath: ${modPath}`, e);
     }
     return this;
   }
@@ -127,7 +127,7 @@ class Hub extends EventEmitter {
       });
 			this.log(this.name, `attached module from object ${obj.name}`);
     } else {
-      console.error(`ATTACH ERROR: spoke definition ${obj} has no name`);
+      console.error(`ATTACH OBJECT ERROR: spoke definition ${obj} has no name`);
     }
 		return this;
 	}
