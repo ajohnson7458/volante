@@ -15,5 +15,7 @@ module.exports = {
   // resolve the path of the parent (for internal use)
   modulePath: path.join(utils.findRoot(module.parent.filename), 'node_modules'),
   // resolve root of parent (for internal use)
-  parentRoot: utils.findRoot(module.parent.filename)
+  parentRoot: utils.findRoot(module.parent.filename),
+  // find parent version number
+  parentVersion: JSON.parse(fs.readFileSync(path.join(utils.findRoot(module.parent.filename), 'package.json'))).version,
 };
