@@ -5,9 +5,10 @@ Volante is a flexible, event-centric framework which facilitates a zero-configur
 ## Features
 
 - super-lightweight (no build-step, no dependencies other than Node.js >= 7)
-- zero-configuration as a goal
+- zero-configuration as a goal, but provides easy config from file or env
 - automatic volante module loading (matched using 'volante' npm keyword)
 - built-in logging methods (logging output delegated to volante spoke modules)
+- can load a config file with easy ENV var overrides
 
 ## `volante.Hub`
 
@@ -43,6 +44,7 @@ some_module.some_method();
 - `attach(name)` - attach Volante module by name
 - `attachLocal(path)` - attach a local JS module
 - `attachFromObject(obj)` - load a JS object as a Spoke
+- `loadConfig(filename)` - load a config file from project root
 - `getSpoke(name)` - get a Spoke instance by its given name (name: '<>')
 - `getSpokeByNpmName(name)` - get a Spoke instance by its npm module name
 - `shutdown()` - shutdown Volante
@@ -105,7 +107,7 @@ module.exports = {
 		counter: 0,
 	},
 	data() { // as a function so it can be evaluated in context
-	  return { 
+	  return {
 			// "private" data members for Spoke instance, not meant to be changed from
 			// outside the module but this is not enforced
 			privData: [1,2,3],

@@ -12,13 +12,14 @@ class Hub extends EventEmitter {
     super();
 
     this.name = 'VolanteHub';
-		this.version = module.parent.exports.version;
-		this.startTime = new Date();
+    this.version = module.parent.exports.version;
+    this.startTime = new Date();
 
     // all loaded volante modules
     this.spokes = [];
     // spokes which registered for all ('*') events
     this.starSpokes = [];
+    this.config = {};
 
     // debug flag
     this.isDebug = false;
@@ -47,12 +48,12 @@ class Hub extends EventEmitter {
           return; // no (or invalid) package.json, skip
         }
 
-				// make sure it has all the required fields
+        // make sure it has all the required fields
         if (pkg.name &&
-					  pkg.version &&
-					  pkg.description &&
-					  pkg.keywords &&
-					  pkg.keywords.indexOf(module.parent.exports.moduleKeyword) !== -1) {
+            pkg.version &&
+            pkg.description &&
+            pkg.keywords &&
+            pkg.keywords.indexOf(module.parent.exports.moduleKeyword) !== -1) {
           this.attach(pkg.name, pkg.version);
         }
       }
@@ -90,47 +91,79 @@ class Hub extends EventEmitter {
     // load volante module
     try {
       var mod = require(modPath);
-	   	// see if the spoke at least has a name
-	    if (mod.name) {
-	      var newSpoke = new Spoke(this, mod);
-	      this.spokes.push({
-	        name: mod.name,
-	        version: version ? version:'unknown',
-	        instance: newSpoke
-	      });
-		    if (version) {
-		      this.log(this.name, `attached ${mod.name} v${version}`);
-		    } else {
-		      this.log(this.name, `attached ${mod.name}`);
-		    }
-		    this.emit('volante.attached', mod.name);
-	    } else {
-	      console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
-	    }
+      // see if the spoke at least has a name
+      if (mod.name) {
+        var newSpoke = new Spoke(this, mod);
+        this.spokes.push({
+          name: mod.name,
+          version: version ? version:'unknown',
+          instance: newSpoke
+        });
+        if (version) {
+          this.log(this.name, `attached ${mod.name} v${version}`);
+        } else {
+          this.log(this.name, `attached ${mod.name}`);
+        }
+        this.emit('volante.attached', mod.name);
+      } else {
+        console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
+      }
     } catch (e) {
       console.error(`ATTACH ERROR: modPath: ${modPath}`, e);
     }
     return this;
   }
-	//
-	// Attach a Spoke module by using the provided
-	// Spoke Definition Object directly
-	//
-	attachFromObject(obj) {
+  //
+  // Attach a Spoke module by using the provided
+  // Spoke Definition Object directly
+  //
+  attachFromObject(obj) {
     this.debug(this.name, `attaching module from object`);
-		// see if the provided object at least has a name
+    // see if the provided object at least has a name
     if (obj.name) {
       var newSpoke = new Spoke(this, obj);
       this.spokes.push({
         name: obj.name,
         instance: newSpoke
       });
-			this.log(this.name, `attached module from object ${obj.name}`);
+      this.log(this.name, `attached module from object ${obj.name}`);
     } else {
       console.error(`ATTACH OBJECT ERROR: spoke definition ${obj} has no name`);
     }
-		return this;
-	}
+    return this;
+  }
+  //
+  // Load config file relative to project root
+  // config file will be overridden by any env vars with the following pattern:
+  // volante_config_<underscore_path>
+  // i.e. to modify the server.port data item in the config, set the following env var:
+  // volante_config_server_port=3000
+  //
+  loadConfig(filename) {
+    let p = path.join(module.parent.exports.parentRoot, filename);
+    if (fs.existsSync(p)) {
+      console.log(`loading config file: ${filename}`);
+      try {
+        let config = require(p);
+
+        for (let [k, v] of Object.entries(process.env)) {
+          // overrides have to start with volante_config
+          if (k.match(/^volante_config/i)) {
+            // split off path
+            let kp = k.split(/volante_config_/i)[1].split('_').join('.');
+            utils.deepSet(config, kp, v);
+          }
+        }
+
+        this.config = config;
+      } catch(e) {
+        console.error('error loading config file', e);
+      }
+    } else {
+      console.error('!!!!!!\nCONFIG ERROR: couldnt find config file\n!!!!!!');
+    }
+    return this;
+  }
   //
   // get the instance of the spoke with the given module name
   //
@@ -152,6 +185,9 @@ class Hub extends EventEmitter {
       }
     }
     return null;
+  }
+  getConfig() {
+    return this.configuration;
   }
   //
   // If no message is provided, enable debug mode on the hub, otherwise

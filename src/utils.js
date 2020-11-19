@@ -43,3 +43,19 @@ exports.selectProps = function(obj, keys) {
   }
   return ret;
 };
+
+//
+// set a value anywhere in an object given a path
+//
+exports.deepSet = function(obj, path, value) {
+  let a = path.split('.');
+  let o = obj;
+  while (a.length - 1) {
+    let n = a.shift();
+    if (!(n in o)) {
+      o[n] = {};
+    }
+    o = o[n];
+  }
+  o[a[0]] = value;
+};

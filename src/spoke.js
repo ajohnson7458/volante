@@ -97,7 +97,12 @@ class Spoke {
 	//
 	$addProps(mod) {
 		if (mod.props) {
-			Object.assign(this, mod.props);
+			if (this.$hub.config[this.name]) {
+				this.$log("merging config into props");
+				Object.assign(this, mod.props, this.$hub.config[this.name]);
+			} else {
+				Object.assign(this, mod.props);
+			}
 			// save off keys to validate .props event
 			this.$propKeys = Object.keys(mod.props);
 		} else {
