@@ -156,6 +156,10 @@ class Hub extends EventEmitter {
         }
 
         this.config = config;
+        // look for a top-level debug flag
+        if (this.config.debug) {
+          this.debug();
+        }
       } catch(e) {
         console.error('error loading config file', e);
       }
@@ -185,9 +189,6 @@ class Hub extends EventEmitter {
       }
     }
     return null;
-  }
-  getConfig() {
-    return this.configuration;
   }
   //
   // If no message is provided, enable debug mode on the hub, otherwise
