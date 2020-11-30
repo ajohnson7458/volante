@@ -205,10 +205,10 @@ class Hub extends EventEmitter {
     return null;
   }
   //
-  // get aliases to getSpoke
+  // get method is alias to getSpoke
   //
   get(name) {
-    this.getSpoke(name);
+    return this.getSpoke(name);
   }
   //
   // If no message is provided, enable debug mode on the hub, otherwise
