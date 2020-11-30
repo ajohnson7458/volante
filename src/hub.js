@@ -142,10 +142,12 @@ class Hub extends EventEmitter {
   loadConfig(filename) {
     let p = path.join(module.parent.exports.parentRoot, filename);
     if (fs.existsSync(p)) {
-      console.log(`loading config file: ${filename}`);
+      console.log(`> loading config file: ${filename}`);
       try {
         let config = require(p);
 
+        // let env vars override config items if they are prefixed by
+        // volante_config_ and have an underscore-delimited path
         for (let [k, v] of Object.entries(process.env)) {
           // overrides have to start with volante_config
           if (k.match(/^volante_config/i)) {
@@ -159,6 +161,18 @@ class Hub extends EventEmitter {
         // look for a top-level debug flag
         if (this.config.debug) {
           this.debug();
+        }
+        // look for top-level attach flag
+        if (this.config.attach && this.config.attach.length) {
+          for (let m of this.config.attach) {
+            this.attach(m);
+          }
+        }
+        // look for top-level attachLocal flag
+        if (this.config.attachLocal && this.config.attachLocal.length) {
+          for (let m of this.config.attachLocal) {
+            this.attachLocal(m);
+          }
         }
       } catch(e) {
         console.error('error loading config file', e);
@@ -189,6 +203,12 @@ class Hub extends EventEmitter {
       }
     }
     return null;
+  }
+  //
+  // get aliases to getSpoke
+  //
+  get(name) {
+    this.getSpoke(name);
   }
   //
   // If no message is provided, enable debug mode on the hub, otherwise

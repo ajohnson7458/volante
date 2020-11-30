@@ -97,9 +97,13 @@ class Spoke {
 	//
 	$addProps(mod) {
 		if (mod.props) {
+			// if the hub's config contains a top-level key matching this
+			// module's name, merge in the data items into props
 			if (this.$hub.config[this.name]) {
-				this.$log("merging config into props");
+				this.$log(`merging hub config for ${this.name} into props`);
 				Object.assign(this, mod.props, this.$hub.config[this.name]);
+				// set a flag indicating that props were loaded from config
+				this.configProps = true;
 			} else {
 				Object.assign(this, mod.props);
 			}
