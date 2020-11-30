@@ -149,10 +149,10 @@ class Hub extends EventEmitter {
         // let env vars override config items if they are prefixed by
         // volante_config_ and have an underscore-delimited path
         for (let [k, v] of Object.entries(process.env)) {
-          // overrides have to start with volante_config
-          if (k.match(/^volante_config/i)) {
+          // overrides have to start with volante_
+          if (k.match(/^volante_/i)) {
             // split off path
-            let kp = k.split(/volante_config_/i)[1].split('_').join('.');
+            let kp = k.split(/volante_/i)[1].split('_').join('.');
             utils.deepSet(config, kp, v);
           }
         }

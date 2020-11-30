@@ -2,13 +2,14 @@
 
 Volante is a flexible, event-centric framework which facilitates a zero-configuration hub-and-spoke pattern. Leveraging the asynchronous nature of events makes it especially suited for modular microservices and services which span client and server. Although true zero-configuration is not always possible, Volante seeks to minimize configuration by automatically finding all local Volante npm modules and attaching them as spokes.
 
+For when configuration is necessary, Volante makes it easy with a centralized config that can be used to attach spokes, as well as provide initial values for spoke props. Volante looks for environment variables with the volante_ prefix and applies them to the config file object. This makes it easy to override parameters like port numbers or debug mode when deploying production containers.
+
 ## Features
 
 - super-lightweight (no build-step, no dependencies other than Node.js >= 7)
-- zero-configuration as a goal, but provides easy config from file or env
+- zero-configuration as a goal, but provides easy config from file or env overrides
 - automatic volante module loading (matched using 'volante' npm keyword)
 - built-in logging methods (logging output delegated to volante spoke modules)
-- can load a config file with easy ENV var overrides
 
 ## `volante.Hub`
 
@@ -18,6 +19,8 @@ The `volante.Hub` may be extended or instanced directly. The public `volante.Hub
 const volante = require('volante');
 
 let hub = new volante.Hub().attachAll(); // attachAll automatically finds all local Volante modules
+
+hub.loadConfig('config.json'); // load a config file
 
 // various events/handlers
 hub.emit('VolanteExpress.update', {
@@ -30,10 +33,34 @@ hub.on('VolanteExpress.listening', () => {
 });
 
 // to access an instance directly, use:
-let some_module = hub.getInstanceByNpmName('some-volante-module-by-npm-name');
+let some_module = hub.get('VolanteExpress');
 some_module.some_method();
 
 ```
+
+### Config file format
+
+The config file should be a `.json` file and may have the following top level fields which affect Volante config:
+
+- `debug` - global debug mode flag
+- `attach` - array of module npm names to attach from node_modules
+- `attachLocal` - array of local modules to attach
+
+Additionally, any top-level field names matching a Volante spoke name will be loaded as that spoke's props. For example, if the config file contains:
+
+```json
+{
+	"VolanteExpress": {
+		"bind": 0.0.0.0,
+		"port": 3000,
+	}
+}
+```
+the Volante hub will set the `bind` and `port` properties of VolanteExpress at startup (pre-init).
+
+### Data members provided by `volante.Hub`
+
+- `config` - the parsed config file contents, with ENV var overrides applied
 
 ### Methods provided by `volante.Hub`
 
@@ -45,7 +72,7 @@ some_module.some_method();
 - `attachLocal(path)` - attach a local JS module
 - `attachFromObject(obj)` - load a JS object as a Spoke
 - `loadConfig(filename)` - load a config file from project root
-- `getSpoke(name)` - get a Spoke instance by its given name (name: '<>')
+- `get(name)` - get a Spoke instance by its given name (name: '<>')
 - `getSpokeByNpmName(name)` - get a Spoke instance by its npm module name
 - `shutdown()` - shutdown Volante
 
@@ -129,6 +156,9 @@ module.exports = {
 
 			// send events
 			this.$emit('ExampleSpoke.ready', this.someProp);
+
+			// access config file loaded by hub
+			switch (this.$hub.config.auth.mechanism) {};
 		},
 	}
 }
