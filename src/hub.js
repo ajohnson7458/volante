@@ -13,6 +13,7 @@ class Hub extends EventEmitter {
 
     this.name = 'VolanteHub';
     this.version = module.parent.exports.version;
+    this.parentVersion = module.parent.exports.parentVersion;
     this.startTime = new Date();
 
     // all loaded volante modules
