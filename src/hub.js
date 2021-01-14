@@ -160,7 +160,8 @@ class Hub extends EventEmitter {
 
         this.config = config;
         // look for a top-level debug flag
-        if (this.config.debug) {
+        if ((typeof(this.config.debug) === 'boolean' && this.config.debug) ||
+             this.config.debug === 'true') {
           this.debug();
         }
         // look for top-level attach flag

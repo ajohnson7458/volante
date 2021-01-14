@@ -57,5 +57,16 @@ exports.deepSet = function(obj, path, value) {
     }
     o = o[n];
   }
-  o[a[0]] = value;
+  // check for basic type primitives and coerce
+  switch (typeof o[a[0]]) {
+    case 'number':
+      o[a[0]] = parseFloat(value);
+      break;
+    case 'boolean':
+      o[a[0]] = value === 'true';
+      break;
+    default: // string, etc.
+      o[a[0]] = value;
+      break;
+  }
 };
