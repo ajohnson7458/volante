@@ -10,6 +10,7 @@ const utils = require('./utils');
 class Hub extends EventEmitter {
   constructor() {
     super();
+    this.setMaxListeners(200); // up the max listeners for EventEmitter to prevent warnings
 
     this.name = 'VolanteHub';
     this.version = module.parent.exports.version;
