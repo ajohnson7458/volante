@@ -46,14 +46,14 @@ The config file should be a `.json` file and may have the following top level fi
 - `attach` - array of module npm names to attach from node_modules
 - `attachLocal` - array of local modules to attach
 
-Additionally, any top-level field names matching a Volante spoke name will be loaded as that spoke's props. For example, if the config file contains:
+Additionally, the fields of any top-level object names matching a Volante spoke name will be loaded as that spoke's props. For example, if the config file contains:
 
 ```json
 {
-	"VolanteExpress": {
-		"bind": 0.0.0.0,
-		"port": 3000,
-	}
+  "VolanteExpress": {
+    "bind": "0.0.0.0",
+    "port": 3000,
+  }
 }
 ```
 the Volante hub will set the `bind` and `port` properties of VolanteExpress at startup (pre-init).
@@ -91,7 +91,7 @@ All Volante built-in events are namespaced with `volante.` They are listed below
 - `volante.log` - log event
   ```js
   {
-  	ts: Date,
+    ts: Date,
     lvl: 'normal', // or 'debug', 'warning', 'error'
     src: String, // Spoke class name
     msg: Any
@@ -108,59 +108,59 @@ Volante modules are called Spokes and simply export an object with some predefin
 
 ```js
 module.exports = {
-	name: 'ExampleSpoke',
-	init() {
-		// constructor-like initialization
-		// called after all props and methods are available on this, i.e.
-		this.privData = [0];
-		this.someMethod(1);
-	},
-	done() {
-		// destructor-like de-initialization
-	},
-	events: {
-		// events this Spoke subscribes to, can be from this spoke or volante-wide
-		'some.event'(arg) {
-			// called when Hub receives 'some.event'
-			// can use methods, props, or data here, i.e.
-			this.someMethod(arg);
-		},
-	},
-	props: {
-		// properties added to Spoke instance
-		// they are automatically updated when Hub distributes
-		// an 'ExampleSpoke.update' event (i.e. `${this.name}.update`)
-		someProp: true,
-		counter: 0,
-	},
-	data() { // as a function so it can be evaluated in context
-	  return {
-			// "private" data members for Spoke instance, not meant to be changed from
-			// outside the module but this is not enforced
-			privData: [1,2,3],
-		};
-	},
-	updated() {
-		// called automatically after props are updated in response to the
-		// 'ExampleSpoke.update' event (see props)
-		this.someMethod(this.someProp);
-	},
-	methods: {
-		// methods are added to Spoke instance (watch for name collisions with props)
-		someMethod(arg) {
-			// do stuff
-			this.someProp = arg;
+  name: 'ExampleSpoke',
+  init() {
+    // constructor-like initialization
+    // called after all props and methods are available on this, i.e.
+    this.privData = [0];
+    this.someMethod(1);
+  },
+  done() {
+    // destructor-like de-initialization
+  },
+  events: {
+    // events this Spoke subscribes to, can be from this spoke or volante-wide
+    'some.event'(arg) {
+      // called when Hub receives 'some.event'
+      // can use methods, props, or data here, i.e.
+      this.someMethod(arg);
+    },
+  },
+  props: {
+    // properties added to Spoke instance
+    // they are automatically updated when Hub distributes
+    // an 'ExampleSpoke.update' event (i.e. `${this.name}.update`)
+    someProp: true,
+    counter: 0,
+  },
+  data() { // as a function so it can be evaluated in context
+    return {
+      // "private" data members for Spoke instance, not meant to be changed from
+      // outside the module but this is not enforced
+      privData: [1,2,3],
+    };
+  },
+  updated() {
+    // called automatically after props are updated in response to the
+    // 'ExampleSpoke.update' event (see props)
+    this.someMethod(this.someProp);
+  },
+  methods: {
+    // methods are added to Spoke instance (watch for name collisions with props)
+    someMethod(arg) {
+      // do stuff
+      this.someProp = arg;
 
-			// log stuff
-			this.$log('called someMethod');
+      // log stuff
+      this.$log('called someMethod');
 
-			// send events
-			this.$emit('ExampleSpoke.ready', this.someProp);
+      // send events
+      this.$emit('ExampleSpoke.ready', this.someProp);
 
-			// access config file loaded by hub
-			switch (this.$hub.config.auth.mechanism) {};
-		},
-	}
+      // access config file loaded by hub
+      switch (this.$hub.config.auth.mechanism) {};
+    },
+  }
 }
 ```
 
