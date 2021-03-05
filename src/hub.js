@@ -293,16 +293,10 @@ class Hub extends EventEmitter {
     this.starSpokes.push(f);
   }
   //
-  // The Hub's own emit interface
+  // volante hub event emitter, checks for any spokes
+  // which registered for '*' (all events)
   //
   emit(type, ...args) {
-    this.emitWithName(this.name, type, ...args);
-  }
-  //
-  // emit interface used by spokes, so  name is included,
-  // checks for any spokes which registered for '*' (all events)
-  //
-  emitWithName(name, type, ...args) {
     // if there are star spokes in the system, we'll have to
     // send every event to each
     if (this.starSpokes.length > 0) {
@@ -314,10 +308,10 @@ class Hub extends EventEmitter {
         }
       }
       // send sanitized args to any spokes which registered for '*'
-      this.starSpokes.forEach(f => f(type, ...saniArgs, name));
+      this.starSpokes.forEach(f => f(type, ...saniArgs));
     }
     // emit using EventEmitter
-    super.emit(type, ...args, name);
+    super.emit(type, ...args);
     return this;
   }
   //
