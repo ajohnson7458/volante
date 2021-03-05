@@ -131,9 +131,7 @@ class Spoke {
 	// Emit an event across the Volante framework
 	//
 	$emit(...args) {
-		// user internal emit with name method so subscribers will get name
-		// as the last argument
-		this.$hub.emitWithName(this.name, ...args);
+		this.$hub.emit(...args);
 	}
 	//
 	// Proxy the Hub's isDebug property. Useful for minimizing debug log
