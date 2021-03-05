@@ -293,21 +293,31 @@ class Hub extends EventEmitter {
     this.starSpokes.push(f);
   }
   //
-  // volante hub event middleware, currently we only send to any spokes
-  // which registered for '*' (all events)
+  // The Hub's own emit interface
   //
   emit(type, ...args) {
-    // remove any functions from args, not supported for star spokes
-    let saniArgs = [];
-    for (let a of args) {
-      if (typeof(a) !== 'function') {
-        saniArgs.push(a);
+    this.emitWithName(this.name, type, ...args);
+  }
+  //
+  // emit interface used by spokes, so  name is included,
+  // checks for any spokes which registered for '*' (all events)
+  //
+  emitWithName(name, type, ...args) {
+    // if there are star spokes in the system, we'll have to
+    // send every event to each
+    if (this.starSpokes.length > 0) {
+      // remove any functions from args, not supported for star spokes
+      let saniArgs = [];
+      for (let a of args) {
+        if (typeof(a) !== 'function') {
+          saniArgs.push(a);
+        }
       }
+      // send sanitized args to any spokes which registered for '*'
+      this.starSpokes.forEach(f => f(type, ...saniArgs, name));
     }
-    // send sanitized args to any spokes which registered for '*'
-    this.starSpokes.forEach(f => f(type, ...saniArgs));
     // emit using EventEmitter
-    super.emit(type, ...args);
+    super.emit(type, ...args, name);
     return this;
   }
   //
