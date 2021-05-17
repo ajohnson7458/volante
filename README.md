@@ -61,6 +61,9 @@ the Volante hub will set the `bind` and `port` properties of VolanteExpress at s
 ### Data members provided by `volante.Hub`
 
 - `config` - the parsed config file contents, with ENV var overrides applied
+- `isDebug` - boolean flag indicating if volante is in debug mode
+- `isTesting` - boolean flag indicating result of `process.env.NODE_ENV === 'test'`
+- `isProduction` - boolean flag indicating result of `process.env.NODE_ENV === 'production'`
 
 ### Methods provided by `volante.Hub`
 
@@ -164,11 +167,12 @@ module.exports = {
 }
 ```
 
-### Built-in Properties
+### Built-in Spoke Properties
 - `$hub` - a reference to the central `volante.Hub`
 - `$emit` - emit an event across volante
+- `$isDebug` - aliases the `this.$hub.isDebug` property to check for debug mode
 
-### Built-in Methods
+### Built-in Spoke Methods
 - `$log(...)` - normal-level log messages
 - `$debug(...)` - debug-level log
 - `$warn(...)` - warning-level log
