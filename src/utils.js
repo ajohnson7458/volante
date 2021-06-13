@@ -65,6 +65,9 @@ exports.deepSet = function(obj, path, value) {
     case 'boolean':
       o[a[0]] = value === 'true';
       break;
+    case 'object':
+      o[a[0]] = JSON.parse(value);
+      break;
     default: // string, etc.
       o[a[0]] = value;
       break;
