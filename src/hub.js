@@ -21,8 +21,8 @@ class Hub extends EventEmitter {
     this.spokes = [];
     // spokes which registered for all ('*') events
     this.starSpokes = [];
+    // stores the config loaded using loadConfig
     this.config = {};
-
     // debug flag
     this.isDebug = false;
     // testing flag, set from NODE_ENV

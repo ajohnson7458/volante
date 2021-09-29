@@ -28,6 +28,10 @@ class Spoke {
 	    // call init() method
 	    mod.init.bind(this)();
 		}
+		// call updated() after init() if it exists and props were set from config
+		if (this.configProps && mod.updated) {
+	    mod.updated.bind(this)();
+		}
 		if (mod.done) {
 			// bind done() for later
 			this.done = mod.done.bind(this);
