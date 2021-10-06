@@ -58,6 +58,10 @@ Additionally, the fields of any top-level object names matching a Volante spoke 
 ```
 the Volante hub will set the `bind` and `port` properties of VolanteExpress at startup (pre-init).
 
+#### Env var override
+
+For the above example config, you can define `volante_VolanteExpress_port=8080` to override the port value. Everything after the `volante_` prefix is case-sensitive, to ensure a positive match in the config file.
+
 ### Data members provided by `volante.Hub`
 
 - `config` - the parsed config file contents, with ENV var overrides applied
