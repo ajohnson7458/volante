@@ -167,8 +167,8 @@ class Spoke {
   // Special "I'm ready" log message, sets internal status to ready
   //
   $ready(...args) {
-    this.$hub.ready(this.name, ...args);
     this.$setStatus('ready', ...args);
+    this.$hub.ready(this.name, ...args);
     return this;
   }
   //
@@ -189,8 +189,8 @@ class Spoke {
   // error handler
   //
   $error(...args) {
-    this.$hub.error(this.name, ...args);
     this.$setStatus('error', ...args);
+    this.$hub.error(this.name, ...args);
     return new Error(`${this.name}: ${args.join(',')}`);
   }
 	//
