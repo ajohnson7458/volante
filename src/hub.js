@@ -164,6 +164,10 @@ class Hub extends EventEmitter {
         }
 
         this.config = config;
+        // look for a top-level name field
+        if (this.config.name && typeof(this.config.name) === 'string') {
+          this.name = this.config.name;
+        }
         // look for a top-level debug flag
         if ((typeof(this.config.debug) === 'boolean' && this.config.debug) ||
              this.config.debug === 'true') {
@@ -325,7 +329,7 @@ class Hub extends EventEmitter {
   getAttached() {
     let ret = [
       {
-        name: 'Volante Hub',
+        name: this.name,
         isDebug: this.isDebug,
       },
     ];
@@ -337,6 +341,40 @@ class Hub extends EventEmitter {
         data: utils.selectProps(s.instance, s.instance.$dataKeys),
         handledEvents: s.instance.handledEvents,
         emittedEvents: s.instance.emittedEvents,
+      });
+    }
+    return ret;
+  }
+  //
+  // get status object for all attached spokes,
+  //
+  getStatus() {
+    let ret = {
+      name: this.name,
+      isDebug: this.isDebug,
+      spokes: [],
+      statusCounts: {
+        unknown: 0,
+        ready: 0,
+        error: 0,
+      },
+    };
+    for (let s of this.spokes) {
+      switch (s.instance.$status.status) {
+        case 'ready':
+          ret.statusCounts.ready++;
+          break;
+        case 'error':
+          ret.statusCounts.error++;
+          break;
+        default:
+          ret.statusCounts.unknown++;
+          break;
+      }
+      ret.spokes.push({
+        name: s.name,
+        version: s.version,
+        status: s.instance.$status,
       });
     }
     return ret;

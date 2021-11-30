@@ -11,6 +11,7 @@ class Spoke {
   constructor(hub, mod) {
     // save reference to hub
     this.$hub = hub;
+		this.$setStatus('unknown'); // default status
 
 		// initialize metadata
 		this.name = mod.name;
@@ -138,6 +139,15 @@ class Spoke {
 		this.$hub.emit(...args);
 	}
 	//
+	// Set the internal status object
+	//
+	$setStatus(status, args = []) {
+		this.$status = {
+			status,
+			args,
+		};
+	}
+	//
 	// Proxy the Hub's isDebug property. Useful for minimizing debug log
 	// performance impace by not calling $debug() or rendering its arguments
 	// (e.g. this.$isDebug && this.$debug(...))
@@ -151,6 +161,14 @@ class Spoke {
   //
   $debug(...args) {
     this.$hub.debug(this.name, ...args);
+    return this;
+  }
+  //
+  // Special "I'm ready" log message, sets internal status to ready
+  //
+  $ready(...args) {
+    this.$hub.log(this.name, ...args);
+    this.$setStatus('ready', ...args);
     return this;
   }
   //
@@ -172,6 +190,7 @@ class Spoke {
   //
   $error(...args) {
     this.$hub.error(this.name, ...args);
+    this.$setStatus('error', ...args);
     return new Error(`${this.name}: ${args.join(',')}`);
   }
 	//

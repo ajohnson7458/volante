@@ -10,6 +10,7 @@ For when configuration is necessary, Volante makes it easy with a centralized co
 - zero-configuration as a goal, but provides easy config from file or env overrides
 - automatic volante module loading (matched using 'volante' npm keyword)
 - built-in logging methods (logging output delegated to volante spoke modules)
+- built-in status tracking for modules
 
 ## `volante.Hub`
 
@@ -42,6 +43,7 @@ some_module.some_method();
 
 The config file should be a `.json` file and may have the following top level fields which affect Volante config:
 
+- `name` - set the Hub name, effectively setting the name for the entire service
 - `debug` - global debug mode flag
 - `attach` - array of module npm names to attach from node_modules
 - `attachLocal` - array of local modules to attach
@@ -81,6 +83,7 @@ For the above example config, you can define `volante_VolanteExpress_port=8080` 
 - `loadConfig(filename)` - load a config file from project root
 - `get(name)` - get a Spoke instance by its given name (name: '<>')
 - `getSpokeByNpmName(name)` - get a Spoke instance by its npm module name
+- `getAttached()` - return spoke topology, including spoke statuses
 - `shutdown()` - shutdown Volante
 
 ### Events emitted by `volante.Hub`
@@ -166,6 +169,10 @@ module.exports = {
 
       // access config file loaded by hub
       switch (this.$hub.config.auth.mechanism) {};
+
+      // special log level which also sets the status for this module as ready,
+      // the Hub will report this module as ready unless the module calls this.$error for anything
+      this.$ready('connected and good to go');
     },
   }
 }
@@ -177,10 +184,11 @@ module.exports = {
 - `$isDebug` - aliases the `this.$hub.isDebug` property to check for debug mode
 
 ### Built-in Spoke Methods
+- `$ready(...)` - signal that module is ready, also sets internal status-tracking to ready
 - `$log(...)` - normal-level log messages
 - `$debug(...)` - debug-level log
 - `$warn(...)` - warning-level log
-- `$error(...)` - log an error, return a new Error ready to throw
+- `$error(...)` - log an error, returns a new Error object which can be thrown, also sets internal state-tracking to error
 - `$shutdown()` - request a shutdown
 
 ## License
