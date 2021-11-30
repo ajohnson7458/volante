@@ -167,7 +167,7 @@ class Spoke {
   // Special "I'm ready" log message, sets internal status to ready
   //
   $ready(...args) {
-    this.$hub.log(this.name, ...args);
+    this.$hub.ready(this.name, ...args);
     this.$setStatus('ready', ...args);
     return this;
   }

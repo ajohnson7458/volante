@@ -243,6 +243,18 @@ class Hub extends EventEmitter {
     return this;
   }
   //
+  // ready log message handler
+  //
+  ready(src, ...args) {
+    this.emit('volante.log', {
+      ts: new Date(),
+      lvl: 'ready',
+      src: src,
+      msg: args
+    });
+    return this;
+  }
+  //
   // normal log message handler
   //
   log(src, ...args) {
