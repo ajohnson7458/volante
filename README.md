@@ -184,7 +184,7 @@ module.exports = {
 - `$isDebug` - aliases the `this.$hub.isDebug` property to check for debug mode
 
 ### Built-in Spoke Methods
-- `$ready(...)` - signal that module is ready, also sets internal status-tracking to ready
+- `$ready(...)` - signal that module is ready, also sets internal status-tracking to ready and emits a `<name>.ready` event
 - `$log(...)` - normal-level log messages
 - `$debug(...)` - debug-level log
 - `$warn(...)` - warning-level log
