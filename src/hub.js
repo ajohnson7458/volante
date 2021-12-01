@@ -29,10 +29,8 @@ class Hub extends EventEmitter {
     this.isTesting = process.env.NODE_ENV === 'test';
     // testing flag, set from NODE_ENV
     this.isProduction = process.env.NODE_ENV === 'production';
-
     // directory to look for modules, resolved in index.js
     this.nodeModulesPath = module.parent.exports.modulePath;
-
     // pkg blacklist (don't try to load anything in nodeModulesPath matching these)
     this.packageBlacklist = ['.bin'];
   }

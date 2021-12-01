@@ -119,6 +119,12 @@ Volante modules are called Spokes and simply export an object with some predefin
 ```js
 module.exports = {
   name: 'ExampleSpoke',
+  props: {
+    // effectively the public properties of the module,
+    // updated by '<name>.update' event or by config file
+    someProp: true,
+    port: 8080,
+  },
   init() {
     // constructor-like initialization
     // called after all props and methods are available on this, i.e.
@@ -136,27 +142,20 @@ module.exports = {
       this.someMethod(arg);
     },
   },
-  props: {
-    // properties added to Spoke instance
-    // they are automatically updated when Hub distributes
-    // an 'ExampleSpoke.update' event (i.e. `${this.name}.update`)
-    someProp: true,
-    counter: 0,
-  },
-  data() { // as a function so it can be evaluated in context
+  data() { // private variables, as a function so it can be evaluated in context
     return {
-      // "private" data members for Spoke instance, not meant to be changed from
-      // outside the module but this is not enforced
+      // initialize private data members for Spoke instance, not meant to be changed from
+      // outside the module but this is not enforced by JS
       privData: [1,2,3],
     };
   },
   updated() {
     // called automatically after props are updated in response to the
-    // 'ExampleSpoke.update' event (see props)
+    // 'ExampleSpoke.update' event (see props) or config file
     this.someMethod(this.someProp);
   },
   methods: {
-    // methods are added to Spoke instance (watch for name collisions with props)
+    // methods are added to Spoke instance (watch for name collisions with props/data/stats)
     someMethod(arg) {
       // do stuff
       this.someProp = arg;
