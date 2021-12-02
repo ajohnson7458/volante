@@ -22,6 +22,7 @@ class Spoke {
 
 		this.$addMethods(mod);
 		this.$addProps(mod);
+		this.$addStats(mod);
 		this.$addEvents(mod);
 		this.$addData(mod);
 
@@ -56,10 +57,10 @@ class Spoke {
 			for (let [k,v] of Object.entries(mod.events)) {
 				this.handledEvents.push(`${k}${v.toString().match(/\(.*\)/)[0]}`);
 				if (k === '*') {
-					// tell hub to treat us as a star spoke
-					this.$hub.onAll(v.bind(this));
+					// tell hub to treat us as a star spoke, onAll is a hub method
+					this.$hub.onAll(this.name, v.bind(this));
 				} else {
-					// traditional event register
+					// traditional event register, this method is inherited from EventEmitter
 					this.$hub.on(k, v.bind(this));
 				}
 			}
@@ -116,6 +117,19 @@ class Spoke {
 			this.$propKeys = Object.keys(mod.props);
 		} else {
 			this.$propKeys = [];
+		}
+	}
+	//
+	// Merge stats from SDO to this instance
+	//
+	$addStats(mod) {
+		if (mod.stats) {
+			// copy stats fields into module
+			Object.assign(this, mod.stats);
+			// save off keys to validate .props event
+			this.$statKeys = Object.keys(mod.stats);
+		} else {
+			this.$statKeys = [];
 		}
 	}
 	//
@@ -186,7 +200,7 @@ class Spoke {
     return this;
   }
   //
-  // error handler
+  // error handler, returns a throw-able error
   //
   $error(...args) {
     this.$setStatus('error', ...args);

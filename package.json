@@ -10,5 +10,8 @@
     "hub",
     "spoke",
     "framework"
-  ]
+  ],
+  "devDependencies": {
+    "volante-console": "^3.3.1"
+  }
 }

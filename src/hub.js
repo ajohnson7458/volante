@@ -308,10 +308,26 @@ class Hub extends EventEmitter {
     return this;
   }
   //
-  // called by spoke.js to register a spoke to receive all events ('*')
+  // called by spoke.js (or manually at this.$hub.onAll if you know what you are doing)
+  // to register a spoke to receive all events ('*')
   //
-  onAll(f) {
-    this.starSpokes.push(f);
+  onAll(src, handler) {
+    this.warn(this.name, `${src} subcribing for all events`);
+    let ss = this.starSpokes.find(o => o.src === src);
+    if (!ss) {
+      this.starSpokes.push({
+        src,
+        handler,
+      });
+    }
+  }
+  //
+  // unsubscribe a star spoke
+  //
+  offAll(src) {
+    this.warn(this.name, `${src} unsubcribing from all events`);
+    let idx = this.starSpokes.find(o => o.src === src);
+    this.starSpokes.splice(idx, 1);
   }
   //
   // volante hub event emitter, checks for any spokes
@@ -321,7 +337,7 @@ class Hub extends EventEmitter {
     // if there are star spokes in the system, we'll have to
     // send every event to each
     if (this.starSpokes.length > 0) {
-      // remove any functions from args, not supported for star spokes
+      // remove any functions from args, they are not supported for star spokes
       let saniArgs = [];
       for (let a of args) {
         if (typeof(a) !== 'function') {
@@ -329,7 +345,7 @@ class Hub extends EventEmitter {
         }
       }
       // send sanitized args to any spokes which registered for '*'
-      this.starSpokes.forEach(f => f(type, ...saniArgs));
+      this.starSpokes.forEach(f => f.handler(type, ...saniArgs));
     }
     // emit using EventEmitter
     super.emit(type, ...args);
@@ -388,6 +404,7 @@ class Hub extends EventEmitter {
         name: s.name,
         version: s.version,
         status: s.instance.$status,
+        stats: utils.selectProps(s.instance, s.instance.$statKeys),
       });
     }
     return ret;

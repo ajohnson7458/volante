@@ -23,17 +23,12 @@ let hub = new volante.Hub().attachAll(); // attachAll automatically finds all lo
 
 hub.loadConfig('config.json'); // load a config file
 
-// various events/handlers
-hub.emit('VolanteExpress.update', {
-  bind: '127.0.0.1',
-  port: 3000,
-});
-
+// the hub can act on any volante event here
 hub.on('VolanteExpress.listening', () => {
   console.log('my server is running')
 });
 
-// to access an instance directly, use:
+// to access an instance directly, use .get()
 let some_module = hub.get('VolanteExpress');
 some_module.some_method();
 
@@ -124,6 +119,11 @@ module.exports = {
     // updated by '<name>.update' event or by config file
     someProp: true,
     port: 8080,
+  },
+  stats: {
+    // this section is for storing your spoke module's stats,
+    // they will be included in the getStatus output by the Hub
+    counter: 0,
   },
   init() {
     // constructor-like initialization
