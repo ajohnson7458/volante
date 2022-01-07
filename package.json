@@ -9,7 +9,10 @@
   "keywords": [
     "hub",
     "spoke",
-    "framework"
+    "framework",
+    "wheel",
+    "configuration",
+    "events"
   ],
   "devDependencies": {
     "volante-console": "^3.3.1"

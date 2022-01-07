@@ -6,19 +6,20 @@ const utils = require('./utils');
 
 //
 // Hub provides a base class and reference implementation for a volante Hub.
+// it extends EventEmitter so that user's may emit and receive events on it
 //
 class Hub extends EventEmitter {
   constructor() {
     super();
-    this.setMaxListeners(200); // up the max listeners for EventEmitter to prevent warnings
+    this.setMaxListeners(1000); // up the max listeners for EventEmitter to prevent warnings
 
-    this.name = 'VolanteHub';
+    this.name = 'VolanteHub'; // the default name, can be set through config file
     this.version = module.parent.exports.version;
     this.parentVersion = module.parent.exports.parentVersion;
     this.startTime = new Date();
 
     // all loaded volante modules
-    this.spokes = [];
+    this.spokes = {};
     // spokes which registered for all ('*') events
     this.starSpokes = [];
     // stores the config loaded using loadConfig
@@ -35,121 +36,20 @@ class Hub extends EventEmitter {
     this.packageBlacklist = ['.bin'];
   }
   //
-  // find any npm modules with the special keyword calling them out as volante
-  // modules
-  //
-  attachAll() {
-    // iterate through node_modules looking for volante modules
-    fs.readdirSync(this.nodeModulesPath).forEach((dir) => {
-      if (this.packageBlacklist.indexOf(dir) < 0) {
-        // path to package.json in module directory
-        var pkgPath = path.join(this.nodeModulesPath, dir, 'package.json');
-
-        // try to load package.json for each module
-        try {
-          var pkg = require(pkgPath);
-        } catch(e) {
-          return; // no (or invalid) package.json, skip
-        }
-
-        // make sure it has all the required fields
-        if (pkg.name &&
-            pkg.version &&
-            pkg.description &&
-            pkg.keywords &&
-            pkg.keywords.indexOf(module.parent.exports.moduleKeyword) !== -1) {
-          this.attach(pkg.name, pkg.version);
-        }
-      }
-    });
-    this.emit('volante.attachedAll', this.spokes.length);
-    return this;
-  }
-  //
-  // standard attach function, provide Volante Spoke module name which is assumed
-  // to be installed in local node_modules directory
-  //
-  attach(name, version) {
-    if (version) {
-      this.debug(this.name, `attaching ${name} v${version}`);
-    } else {
-      this.debug(this.name, `attaching ${name}`);
-    }
-    var modPath = path.join(this.nodeModulesPath, name);
-    this.attachByFullPath(modPath, version);
-    return this;
-  }
-  //
-  // attach local/relative Volante Spoke module
-  //
-  attachLocal(name) {
-    this.debug(this.name, `attaching local module ${name}`);
-    var modPath = path.join(module.parent.exports.parentRoot, name);
-    this.attachByFullPath(modPath);
-    return this;
-  }
-  //
-  // attach Volante Spoke module by providing fully resolved path
-  //
-  attachByFullPath(modPath, version) {
-    // load volante module
-    try {
-      var mod = require(modPath);
-      // see if the spoke at least has a name
-      if (mod.name) {
-        var newSpoke = new Spoke(this, mod);
-        this.spokes.push({
-          name: mod.name,
-          version: version ? version:'unknown',
-          instance: newSpoke
-        });
-        if (version) {
-          this.log(this.name, `attached ${mod.name} v${version}`);
-        } else {
-          this.log(this.name, `attached ${mod.name}`);
-        }
-        this.emit('volante.attached', mod.name);
-      } else {
-        console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
-      }
-    } catch (e) {
-      console.error(`ATTACH ERROR: modPath: ${modPath}`, e);
-    }
-    return this;
-  }
-  //
-  // Attach a Spoke module by using the provided
-  // Spoke Definition Object directly
-  //
-  attachFromObject(obj) {
-    this.debug(this.name, `attaching module from object`);
-    // see if the provided object at least has a name
-    if (obj.name) {
-      var newSpoke = new Spoke(this, obj);
-      this.spokes.push({
-        name: obj.name,
-        instance: newSpoke
-      });
-      this.log(this.name, `attached module from object ${obj.name}`);
-    } else {
-      console.error(`ATTACH OBJECT ERROR: spoke definition ${obj} has no name`);
-    }
-    return this;
-  }
-  //
-  // Load config file relative to project root
+  // Load JSON config file relative to project root
   // config file will be overridden by any env vars with the following pattern:
-  // volante_config_<underscore_path>
-  // i.e. to modify the server.port data item in the config, set the following env var:
-  // volante_config_server_port=3000
+  // volante_<underscore_path>
+  // i.e. if you're using VolanteExpress and want to modify the port,
+  // set the following env var: volante_VolanteExpress_port=3000
   //
   loadConfig(filename) {
+    // config file should be relative to module root
     let p = path.join(module.parent.exports.parentRoot, filename);
     if (fs.existsSync(p)) {
-      console.log(`> loading config file: ${filename}`);
+      console.log(`>\n> volante is loading config from: ${filename}\n>`);
       try {
+        // load it
         let config = require(p);
-
         // let env vars override config items if they are prefixed by
         // volante_config_ and have an underscore-delimited path
         for (let [k, v] of Object.entries(process.env)) {
@@ -160,9 +60,9 @@ class Hub extends EventEmitter {
             utils.deepSet(config, kp, v);
           }
         }
-
+        // save full object to hub
         this.config = config;
-        // look for a top-level name field
+        // look for a top-level name field so we can set the cluster name
         if (this.config.name && typeof(this.config.name) === 'string') {
           this.name = this.config.name;
         }
@@ -192,32 +92,119 @@ class Hub extends EventEmitter {
     return this;
   }
   //
-  // get the instance of the spoke with the given module name
+  // find any npm modules with the special keyword calling them out as volante
+  // modules
   //
-  getSpokeByNpmName(name) {
-    for (let s of this.spokes) {
-      if (s.name === name) {
-        return s.instance;
+  attachAll() {
+    // iterate through node_modules looking for volante modules
+    fs.readdirSync(this.nodeModulesPath).forEach((dir) => {
+      if (this.packageBlacklist.indexOf(dir) < 0) {
+        // path to package.json in module directory
+        var pkgPath = path.join(this.nodeModulesPath, dir, 'package.json');
+
+        // try to load package.json for each module
+        try {
+          var pkg = require(pkgPath);
+        } catch(e) {
+          return; // no (or invalid) package.json, skip
+        }
+
+        // make sure it has all the required fields
+        if (pkg.name &&
+            pkg.version &&
+            pkg.description &&
+            pkg.keywords &&
+            pkg.keywords.indexOf(module.parent.exports.moduleKeyword) !== -1) {
+          this.attach(pkg.name, pkg.version);
+        }
       }
-    }
-    return null;
+    });
+    this.emit('volante.attachedAll', Object.keys(this.spokes).length);
+    return this;
   }
   //
-  // get the instance of the spoke with the given module name
+  // standard attach function, provide Volante Spoke module name which is assumed
+  // to be installed in local node_modules directory
   //
-  getSpoke(name) {
-    for (let s of this.spokes) {
-      if (s.instance.name && s.instance.name === name) {
-        return s.instance;
+  attach(name, version) {
+    if (!version) {
+      // try to find package.json and get the version
+      var pkgPath = path.join(this.nodeModulesPath, name, 'package.json');
+      // try to load package.json
+      try {
+        var pkg = require(pkgPath);
+      } catch(e) {
+        console.error(`error finding package.json for ${name}`);
+        this.shutdown(); // shutdown since this shouldn't happen
       }
+      version = pkg.version;
     }
-    return null;
+    this.debug(this.name, `attaching ${name} v${version}`);
+    var modPath = path.join(this.nodeModulesPath, name);
+    this.attachByFullPath(modPath, version);
+    return this;
   }
   //
-  // get method is alias to getSpoke
+  // attach local/relative Volante Spoke module
+  //
+  attachLocal(name) {
+    this.debug(this.name, `attaching local module ${name}`);
+    var modPath = path.join(module.parent.exports.parentRoot, name);
+    this.attachByFullPath(modPath);
+    return this;
+  }
+  //
+  // attach Volante Spoke module by providing fully resolved path
+  //
+  attachByFullPath(modPath, version) {
+    // load volante module
+    try {
+      var mod = require(modPath);
+      // see if the spoke at least has a name field
+      if (mod.name) {
+        // instantiate a Spoke using this module definition
+        var newSpoke = new Spoke(this, mod);
+        // set version from provided npm (if applicable)
+        newSpoke.version = version ? version:'none';
+        this.spokes[mod.name] = newSpoke;
+        if (version) {
+          this.log(this.name, `attached ${mod.name} v${version}`);
+        } else {
+          this.log(this.name, `attached ${mod.name}`);
+        }
+        this.emit('volante.attached', mod.name);
+      } else {
+        console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
+      }
+    } catch (e) {
+      console.error(`ATTACH ERROR: modPath: ${modPath}`, e);
+    }
+    return this;
+  }
+  //
+  // Attach a Spoke module by using the provided
+  // Spoke Definition Object directly
+  //
+  attachFromObject(obj) {
+    this.debug(this.name, `attaching module from object`);
+    // see if the provided object at least has a name
+    if (obj.name) {
+      var newSpoke = new Spoke(this, obj);
+      // set version to none since this is just from an obj (not npm pkg)
+      newSpoke.version = 'none';
+      this.spokes[obj.name] = newSpoke;
+      this.log(this.name, `attached module from object ${obj.name}`);
+    } else {
+      console.error(`ATTACH OBJECT ERROR: spoke definition ${obj} has no name`);
+    }
+    return this;
+  }
+
+  //
+  // get method for spokes via their name string
   //
   get(name) {
-    return this.getSpoke(name);
+    return this.spokes[name];
   }
   //
   // If no message is provided, enable debug mode on the hub, otherwise
@@ -297,8 +284,8 @@ class Hub extends EventEmitter {
   shutdown(src=this.name) {
     this.warn(this.name, `shutdown requested by ${src}`);
     this.emit('volante.shutdown');
-    for (let s of this.spokes) {
-      s.instance.done && s.instance.done();
+    for (let s of Object.values(this.spokes)) {
+      s.done && s.done();
     }
     this.emit('volante.done');
     setTimeout(() => {
@@ -362,20 +349,20 @@ class Hub extends EventEmitter {
         isDebug: this.isDebug,
       },
     ];
-    for (let s of this.spokes) {
+    for (let s of Object.values(this.spokes)) {
       ret.push({
         name: s.name,
         version: s.version,
-        props: utils.selectProps(s.instance, s.instance.$propKeys),
-        data: utils.selectProps(s.instance, s.instance.$dataKeys),
-        handledEvents: s.instance.handledEvents,
-        emittedEvents: s.instance.emittedEvents,
+        props: utils.selectProps(s, s.$propKeys),
+        data: utils.selectProps(s, s.$dataKeys),
+        handledEvents: s.handledEvents,
+        emittedEvents: s.emittedEvents,
       });
     }
     return ret;
   }
   //
-  // get status object for all attached spokes,
+  // get status and stats for all attached spokes, include totals
   //
   getStatus() {
     let ret = {
@@ -388,8 +375,8 @@ class Hub extends EventEmitter {
         error: 0,
       },
     };
-    for (let s of this.spokes) {
-      switch (s.instance.$status.status) {
+    for (let s of Object.values(this.spokes)) {
+      switch (s.$status.status) {
         case 'ready':
           ret.statusCounts.ready++;
           break;
@@ -403,8 +390,8 @@ class Hub extends EventEmitter {
       ret.spokes.push({
         name: s.name,
         version: s.version,
-        status: s.instance.$status,
-        stats: utils.selectProps(s.instance, s.instance.$statKeys),
+        status: s.$status,
+        stats: utils.selectProps(s, s.$statKeys),
       });
     }
     return ret;

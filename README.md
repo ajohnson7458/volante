@@ -1,16 +1,16 @@
 ![volante](https://raw.githubusercontent.com/msmiley/msmiley.github.io/master/volante-with-text.svg?sanitize=true)
 
-Volante is a flexible, event-centric framework which facilitates a zero-configuration hub-and-spoke pattern. Leveraging the asynchronous nature of events makes it especially suited for modular microservices and services which span client and server. Although true zero-configuration is not always possible, Volante seeks to minimize configuration by automatically finding all local Volante npm modules and attaching them as spokes.
-
-For when configuration is necessary, Volante makes it easy with a centralized config that can be used to attach spokes, as well as provide initial values for spoke props. Volante looks for environment variables with the volante_ prefix and applies them to the config file object. This makes it easy to override parameters like port numbers or debug mode when deploying production containers.
+Volante is a lightweight framework for a hub-and-spoke pattern. It organizes your modules into coherent objects and then provides lots of built-in goodies to make it easier to create your app.
 
 ## Features
 
-- super-lightweight (no build-step, no dependencies other than Node.js >= 7)
-- zero-configuration as a goal, but provides easy config from file or env overrides
-- automatic volante module loading (matched using 'volante' npm keyword)
+- structured JSON config file to control the entire wheel and individual modules
+- environment variable overrides to config file for changes at run-time
+- automatic volante module discovery (found using 'volante' npm keyword)
 - built-in logging methods (logging output delegated to volante spoke modules)
 - built-in status tracking for modules
+- structured event handling
+- ability to register for wildcard events ('*')
 
 ## `volante.Hub`
 
@@ -28,19 +28,15 @@ hub.on('VolanteExpress.listening', () => {
   console.log('my server is running')
 });
 
-// to access an instance directly, use .get()
-let some_module = hub.get('VolanteExpress');
-some_module.some_method();
-
 ```
 
 ### Config file format
 
-The config file should be a `.json` file and may have the following top level fields which affect Volante config:
+The config file should be a JSON file and may have the following top level fields which affect Volante config:
 
 - `name` - set the Hub name, effectively setting the name for the entire service
 - `debug` - global debug mode flag
-- `attach` - array of module npm names to attach from node_modules
+- `attach` - array of module npm module names to attach from node_modules
 - `attachLocal` - array of local modules to attach
 
 Additionally, the fields of any top-level object names matching a Volante spoke name will be loaded as that spoke's props. For example, if the config file contains:
@@ -55,7 +51,7 @@ Additionally, the fields of any top-level object names matching a Volante spoke 
 ```
 the Volante hub will set the `bind` and `port` properties of VolanteExpress at startup (pre-init).
 
-#### Env var override
+#### Environment variable override
 
 For the above example config, you can define `volante_VolanteExpress_port=8080` to override the port value. Everything after the `volante_` prefix is case-sensitive, to ensure a positive match in the config file.
 
@@ -77,7 +73,6 @@ For the above example config, you can define `volante_VolanteExpress_port=8080` 
 - `attachFromObject(obj)` - load a JS object as a Spoke
 - `loadConfig(filename)` - load a config file from project root
 - `get(name)` - get a Spoke instance by its given name (name: '<>')
-- `getSpokeByNpmName(name)` - get a Spoke instance by its npm module name
 - `getAttached()` - return spoke topology, including spoke statuses
 - `shutdown()` - shutdown Volante
 
@@ -116,7 +111,7 @@ module.exports = {
   name: 'ExampleSpoke',
   props: {
     // effectively the public properties of the module,
-    // updated by '<name>.update' event or by config file
+    // updated by the config file or real-time by the '<name>.update' event
     someProp: true,
     port: 8080,
   },
@@ -127,7 +122,7 @@ module.exports = {
   },
   init() {
     // constructor-like initialization
-    // called after all props and methods are available on this, i.e.
+    // called after all props and methods are available on 'this'
     this.privData = [0];
     this.someMethod(1);
   },
@@ -141,6 +136,9 @@ module.exports = {
       // can use methods, props, or data here, i.e.
       this.someMethod(arg);
     },
+    '*'() {
+      // event wildcard, will get all volante events
+    }
   },
   data() { // private variables, as a function so it can be evaluated in context
     return {
@@ -151,7 +149,7 @@ module.exports = {
   },
   updated() {
     // called automatically after props are updated in response to the
-    // 'ExampleSpoke.update' event (see props) or config file
+    // config file or real-time by the 'ExampleSpoke.update' event
     this.someMethod(this.someProp);
   },
   methods: {
@@ -173,13 +171,18 @@ module.exports = {
       // the Hub will report this module as ready unless the module calls this.$error for anything
       this.$ready('connected and good to go');
     },
+    async methodUsingAwait() {
+      // you can add async in front of your method to enable await
+      let result = await this.$spokes.OtherModule.doSomething();
+    },
   }
 }
 ```
 
 ### Built-in Spoke Properties
 - `$hub` - a reference to the central `volante.Hub`
-- `$emit` - emit an event across volante
+- `$spokes` - object of all spokes in wheel, facilitates calling other spoke methods directly
+- `$emit` - emit an event across volante wheel
 - `$isDebug` - aliases the `this.$hub.isDebug` property to check for debug mode
 
 ### Built-in Spoke Methods
@@ -189,6 +192,26 @@ module.exports = {
 - `$warn(...)` - warning-level log
 - `$error(...)` - log an error, returns a new Error object which can be thrown, also sets internal state-tracking to error
 - `$shutdown()` - request a shutdown
+
+### Conventions
+
+In general, events should only be used for what events are good for - broadcasting one-way information such as "I'm connected", passing metrics around, or other information that could be useful to the entire wheel.
+
+Events are also appropriate when an abstract API has the potential to be implemented by various different providers. The event names could be kept generic and handled by modules which could be easily switched out (e.g. for different databases) - for a loose-knit application which is easily extensible. The drawback with this scheme is that callbacks must be used as events don't return.
+
+```
+this.$emit('db.find', {}, (err, results) => {
+ // handle error or use results
+});
+```
+
+More tight-knit applications should probably use methods provided by another module directly. This is fully compatible with newer practices such as async/await and returning a Promise:
+
+```
+let result1 = await this.$spokes.OtherModule.asyncMethod();
+let result2 = this.$spokes.OtherModule.usefulMethod().then().catch();
+```
+
 
 ## License
 

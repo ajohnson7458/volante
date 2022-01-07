@@ -11,13 +11,18 @@ class Spoke {
   constructor(hub, mod) {
     // save reference to hub
     this.$hub = hub;
+    // alias the spokes for brevity
+    this.$spokes = hub.spokes;
 		this.$setStatus('unknown'); // default status
 
 		// initialize metadata
 		this.name = mod.name;
 		this.handledEvents = [
-			`${this.name}.update(props)`, // all spokes have this one
+			// all spokes have this one, provides a way to update props
+			// via an event
+			`${this.name}.update(props)`,
 		];
+		// registry of all emitted events (found through naive introspection)
 		this.emittedEvents = [];
 
 		this.$addMethods(mod);
@@ -26,16 +31,16 @@ class Spoke {
 		this.$addEvents(mod);
 		this.$addData(mod);
 
+    // call init() method if defined
 		if (mod.init) {
-	    // call init() method
 	    mod.init.bind(this)();
 		}
 		// call updated() after init() if it exists and props were set from config
 		if (this.configProps && mod.updated) {
 	    mod.updated.bind(this)();
 		}
+		// bind done() for later
 		if (mod.done) {
-			// bind done() for later
 			this.done = mod.done.bind(this);
 		}
   }
