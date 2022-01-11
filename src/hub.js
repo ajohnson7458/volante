@@ -11,13 +11,16 @@ const utils = require('./utils');
 class Hub extends EventEmitter {
   constructor() {
     super();
-    this.setMaxListeners(1000); // up the max listeners for EventEmitter to prevent warnings
-
-    this.name = 'VolanteHub'; // the default name, can be set through config file
+    // up the max listeners for EventEmitter to prevent warnings
+    this.setMaxListeners(1000);
+    // the default name, can be set through config file
+    this.name = 'VolanteHub';
+    // expose some useful values
     this.version = module.parent.exports.version;
+    this.parentRoot = module.parent.exports.parentRoot;
     this.parentVersion = module.parent.exports.parentVersion;
+    // global start time, used for calculating volante uptime
     this.startTime = new Date();
-
     // all loaded volante modules
     this.spokes = {};
     // spokes which registered for all ('*') events
