@@ -88,9 +88,11 @@ class Hub extends EventEmitter {
         }
       } catch(e) {
         console.error('error loading config file', e);
+        this.shutdown();
       }
     } else {
       console.error('!!!!!!\nCONFIG ERROR: couldnt find config file\n!!!!!!');
+      this.shutdown();
     }
     return this;
   }
@@ -178,9 +180,11 @@ class Hub extends EventEmitter {
         this.emit('volante.attached', mod.name);
       } else {
         console.error(`ATTACH ERROR: spoke definition ${mod} has no name`);
+        this.shutdown();
       }
     } catch (e) {
       console.error(`ATTACH ERROR: modPath: ${modPath}`, e);
+      this.shutdown();
     }
     return this;
   }
@@ -199,6 +203,7 @@ class Hub extends EventEmitter {
       this.log(this.name, `attached module from object ${obj.name}`);
     } else {
       console.error(`ATTACH OBJECT ERROR: spoke definition ${obj} has no name`);
+      this.shutdown();
     }
     return this;
   }
