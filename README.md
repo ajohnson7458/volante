@@ -173,7 +173,7 @@ module.exports = {
     },
     async methodUsingAwait() {
       // you can add async in front of your method to enable await
-      let result = await this.$spokes.OtherModule.doSomething();
+      let result = await this.$.OtherModule.doSomething();
     },
   }
 }
@@ -181,7 +181,7 @@ module.exports = {
 
 ### Built-in Spoke Properties
 - `$hub` - a reference to the central `volante.Hub`
-- `$spokes` - object of all spokes in wheel, facilitates calling other spoke methods directly
+- `$` or `$spokes` - object of all spokes in wheel, facilitates calling other spoke methods directly
 - `$emit` - emit an event across volante wheel
 - `$isDebug` - aliases the `this.$hub.isDebug` property to check for debug mode
 
@@ -208,8 +208,8 @@ this.$emit('db.find', {}, (err, results) => {
 More tight-knit applications should probably use methods provided by another module directly. This is fully compatible with newer practices such as async/await and returning a Promise:
 
 ```
-let result1 = await this.$spokes.OtherModule.asyncMethod();
-let result2 = this.$spokes.OtherModule.usefulMethod().then().catch();
+let result1 = await this.$.OtherModule.asyncMethod();
+let result2 = this.$.OtherModule.usefulMethod().then().catch();
 ```
 
 
