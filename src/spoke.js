@@ -12,7 +12,7 @@ class Spoke {
     // save reference to hub
     this.$hub = hub;
     // alias the spokes for brevity
-    this.$spokes = hub.spokes;
+    this.$ = this.$spokes = hub.spokes;
     this.$setStatus('unknown'); // default status
     this.$isReady = false; // default ready state
 
