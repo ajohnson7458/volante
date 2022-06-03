@@ -239,8 +239,6 @@ class Hub extends EventEmitter {
   // ready log message handler
   //
   ready(src, ...args) {
-    // emit a special .ready message using this spoke modules name
-    this.emit(`${src}.ready`, ...args);
     // emit a ready log
     this.emit('volante.log', {
       ts: new Date(),
@@ -248,6 +246,8 @@ class Hub extends EventEmitter {
       src: src,
       msg: args
     });
+    // emit a special .ready message using this spoke modules name
+    this.emit(`${src}.ready`, ...args);
     return this;
   }
   //
