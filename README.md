@@ -80,6 +80,10 @@ For the above example config, you can define `volante_VolanteExpress_port=8080` 
 
 All Volante built-in events are namespaced with `volante.` They are listed below along with the data item emitted with the event.
 
+- `volante.configLoaded` - config file was fully loaded and all modules included in config have been attached
+  ```js
+  String // config filename
+  ```
 - `volante.attachedAll` - all Spokes attached using .attachAll()
   ```js
   Number // number of Spoke modules found

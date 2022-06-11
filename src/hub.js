@@ -94,6 +94,7 @@ class Hub extends EventEmitter {
       console.error('!!!!!!\nCONFIG ERROR: couldnt find config file\n!!!!!!');
       this.shutdown();
     }
+    this.emit('volante.configLoaded', filename);
     return this;
   }
   //
