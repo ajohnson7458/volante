@@ -32,11 +32,11 @@ class Spoke {
     this.$addEvents(mod);
     this.$addData(mod);
 
-    // call init() method on next tick if defined
+    // call init() method if defined
     if (mod.init) {
-      process.nextTick(() => mod.init.bind(this)());
+      mod.init.bind(this)();
     }
-    // call updated() after init() if it exists and props were set from config
+    // call updated() on next tick if it exists and props were set from config
     if (this.configProps && mod.updated) {
       process.nextTick(() => mod.updated.bind(this)());
     }
