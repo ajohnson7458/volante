@@ -162,6 +162,19 @@ class Spoke {
     }
   }
   //
+  // Get the stats values for this instance note this works best for
+  // flat stats values as they will be copied, be warned if you use
+  // objects or arrays in your stats!
+  //
+  $getStats() {
+    let stats = {};
+    for (let s of this.$statKeys) {
+      stats[s] = this[s];
+    }
+    return stats;
+  }
+  //
+  //
   // Merge data from SDO to this instance
   //
   $addData(mod) {
