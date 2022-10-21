@@ -15,6 +15,6 @@
     "events"
   ],
   "devDependencies": {
-    "volante-console": "^3.3.1"
+    "volante-console": "^4.2.0"
   }
 }

@@ -1,0 +1,14 @@
+{
+  "name": "readyTest",
+  "debug": true,
+  "attach": [
+    "volante-console"
+  ],
+  "attachLocal": [
+    "./test/ready/ready.js",
+    "./test/ready/ready2.js"
+  ],
+  "ReadyTestModule": {
+    "count": 0
+  }
+}
